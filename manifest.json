@@ -1,11 +1,11 @@
 {
-  "name": "Junk Removal Profit Calculator",
+  "name": "Junk Removal Profit Calculator — by dyia",
   "short_name": "Profit Calc",
-  "description": "Calculate profit margins on junk removal jobs instantly",
+  "description": "Calculate profit margins on junk removal jobs instantly — powered by dyia",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#22c55e",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f97316",
   "orientation": "portrait",
   "icons": [
     {

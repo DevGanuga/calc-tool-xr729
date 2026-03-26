@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Junk Removal Profit Calculator — powered by dyia</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,855 +12,504 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{min-height:100vh;background:linear-gradient(135deg,#0a0a0a,#111111);padding:2rem 1rem;font-family:'DM Sans',-apple-system,sans-serif;color:#fafafa}
-        .container{max-width:1400px;margin:0 auto}
-        .glow-card{background:rgba(255,255,255,.04);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.4);padding:2rem}
-        .header{text-align:center;margin-bottom:2rem;animation:slideIn .5s ease-out}
-        .badge{display:inline-flex;align-items:center;gap:.75rem;background:linear-gradient(135deg,#f97316,#f59e0b);padding:.5rem 1.5rem;border-radius:9999px;margin-bottom:1rem;box-shadow:0 4px 14px rgba(249,115,22,.35)}
-        .badge span{color:#fff;font-weight:700;font-size:1.125rem}
-        h1{font-family:'Space Grotesk',sans-serif;font-size:2.5rem;font-weight:700;margin-bottom:.5rem;line-height:1.2;letter-spacing:-.02em}
-        .subtitle{color:#a3a3a3;font-size:1.125rem}
-        .grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
-        @media(max-width:1000px){.grid{grid-template-columns:1fr}.results-col{position:static!important}}
-        @media(max-width:640px){.upgrade-banner-inner{flex-direction:column;text-align:center}.two-col{grid-template-columns:1fr!important}}
-        .section-title{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
-        .section-label{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:rgba(249,115,22,.7);margin-bottom:.625rem;margin-top:.25rem}
-        .form-group{margin-bottom:1rem}
-        label{color:#e5e5e5;display:block;margin-bottom:.5rem;font-weight:500;font-size:.9rem}
-        select,input[type="number"],input[type="text"],textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fafafa;padding:.75rem;width:100%;font-family:'DM Sans',sans-serif;font-size:1rem;transition:all .2s ease}
-        textarea{resize:none}
-        select:focus,input:focus,textarea:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.15)}
-        option{background:#171717;color:#fafafa}
-        small{display:block;margin-top:.25rem;font-size:.75rem;color:#737373}
-        .checkbox-container{display:flex;align-items:center;gap:.5rem;padding:.5rem;background:rgba(255,255,255,.04);border-radius:8px;cursor:pointer;transition:all .2s;margin-bottom:.5rem}
-        .checkbox-container:hover{background:rgba(249,115,22,.06)}
-        input[type="checkbox"]{width:20px;height:20px;cursor:pointer;accent-color:#f97316}
-        .info-box{padding:1rem;border-radius:10px;margin-bottom:1.5rem;font-size:.875rem}
-        .info-box.green{background:rgba(249,115,22,.08);border-left:3px solid #f97316;color:#e5e5e5}
-        .info-box.yellow{background:rgba(251,191,36,.08);border-left:3px solid #fbbf24;color:#e5e5e5}
-        .icon{width:24px;height:24px;display:inline-block}
-        @keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .animate-fade-in{animation:fadeIn .3s ease-out}
-        .progress-bar{width:100%;height:12px;background:rgba(255,255,255,.08);border-radius:9999px;overflow:hidden}
-        .progress-fill{height:100%;transition:width .5s ease;border-radius:9999px}
-        table{width:100%;border-collapse:collapse}
-        th,td{padding:.75rem .5rem;text-align:left}
-        th{color:#e5e5e5;font-weight:600;border-bottom:2px solid rgba(255,255,255,.08)}
-        td{color:#a3a3a3;border-bottom:1px solid rgba(255,255,255,.04)}
-        tr:last-child td{border-bottom:none}
-        .price-table td:last-child{text-align:right;color:#f97316;font-weight:600}
-        .footer{text-align:center;margin-top:3rem;padding:1.5rem;background:rgba(255,255,255,.03);border-radius:12px}
-        .footer p{color:#737373;font-size:.875rem}
-        .footer a{color:#f97316;text-decoration:none;font-weight:600}
-        .footer a:hover{text-decoration:underline}
-        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-        #recalculateBtn{background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;font-size:1.125rem;padding:1rem 2rem;border:none;border-radius:12px;cursor:pointer;box-shadow:0 4px 20px rgba(249,115,22,.35);transition:all .3s;width:100%;max-width:400px}
-        #recalculateBtn:hover{box-shadow:0 6px 28px rgba(249,115,22,.45);transform:translateY(-1px)}
-        #recalculateBtn:active{transform:scale(.98)}
-        .upgrade-banner{background:linear-gradient(135deg,#f97316,#f59e0b);border-radius:14px;padding:1.125rem 1.5rem;margin-bottom:2rem;box-shadow:0 4px 20px rgba(249,115,22,.3);animation:slideIn .5s ease-out}
-        .upgrade-banner-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
-        .upgrade-banner-text{color:#000;font-weight:500;font-size:.95rem;display:flex;align-items:center;gap:.75rem;flex:1;min-width:280px}
-        .upgrade-badge{background:#000;color:#f97316;font-weight:800;font-size:.7rem;padding:.2rem .625rem;border-radius:9999px;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
-        .upgrade-cta{background:#000;color:#f97316;font-weight:700;padding:.625rem 1.25rem;border-radius:8px;text-decoration:none;white-space:nowrap;font-size:.875rem;transition:all .2s;flex-shrink:0}
-        .upgrade-cta:hover{background:#1a1a1a;transform:translateY(-1px)}
-        .upgrade-cta code{background:rgba(249,115,22,.2);padding:.15rem .4rem;border-radius:4px;font-size:.8rem}
-        .dyia-results-cta{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.18);border-radius:12px;padding:1.25rem;margin-top:1.5rem;text-align:center}
-        .dyia-results-cta a{display:inline-block;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;padding:.625rem 1.25rem;border-radius:8px;text-decoration:none;font-size:.875rem;transition:all .2s;box-shadow:0 2px 10px rgba(249,115,22,.25)}
-        .dyia-results-cta a:hover{box-shadow:0 4px 16px rgba(249,115,22,.4);transform:translateY(-1px)}
-        /* Cost breakdown bar */
-        .cost-bar-wrap{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06)}
-        .cost-bar{display:flex;height:10px;border-radius:9999px;overflow:hidden;gap:1px}
-        .cost-bar div{transition:width .5s ease}
-        .cost-legend{display:flex;flex-wrap:wrap;gap:.25rem .75rem;margin-top:.5rem}
-        .cost-legend-item{display:flex;align-items:center;gap:.375rem;font-size:.6875rem;color:rgba(255,255,255,.4)}
-        .cost-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-        /* Metrics row */
-        .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1rem;border-top:1px solid rgba(255,255,255,.06)}
-        .metric-label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);font-weight:600;margin-bottom:.25rem}
-        .metric-value{font-size:1.25rem;font-weight:700;font-family:'Space Grotesk',sans-serif;font-feature-settings:'tnum'}
-        .metric-hint{font-size:.625rem;color:rgba(255,255,255,.2);margin-top:.125rem}
-        /* Save button */
-        .save-btn{display:flex;align-items:center;justify-content:center;gap:.625rem;width:100%;padding:.75rem;border-radius:12px;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:600;font-size:.875rem;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(249,115,22,.25);transition:all .2s}
-        .save-btn:hover{box-shadow:0 6px 20px rgba(249,115,22,.35);transform:translateY(-1px)}
-        /* Save modal */
-        .modal-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);animation:fadeIn .15s ease-out}
-        .modal-panel{position:relative;width:100%;max-width:28rem;background:#131315;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideIn .25s ease-out}
-        /* Quote history */
-        .quote-row{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:.5rem}
-        .quote-row:hover .quote-del{opacity:1}
-        .quote-del{opacity:0;background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;padding:.25rem;transition:all .15s;flex-shrink:0}
-        .quote-del:hover{color:#ef4444}
-        /* Mobile floating bar */
-        .mobile-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;display:none;background:rgba(9,9,11,.95);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.08);padding:.75rem 1rem;animation:slideIn .3s ease-out}
-        @media(max-width:1000px){.mobile-bar.visible{display:block}}
-        /* Tax section */
-        .tax-section{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:1rem}
-        .tax-input-wrap{position:relative;width:6rem}
-        .tax-input-wrap input{text-align:right;padding-right:1.75rem}
-        .tax-input-wrap .pct{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:.875rem;pointer-events:none}
-        /* Results column sticky */
-        .results-col{position:sticky;top:1.5rem;align-self:start}
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { min-height: 100vh; background: linear-gradient(160deg, #0a0a0a 0%, #0f0f0f 40%, #111111 100%); padding: 2rem 1rem; font-family: 'DM Sans', -apple-system, sans-serif; color: #fafafa; -webkit-font-smoothing: antialiased; }
+        ::selection { background: rgba(249, 115, 22, .25); }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .glow-card {
+            background: rgba(255,255,255,.035);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.35);
+            padding: 1.75rem;
+            transition: border-color .25s ease, box-shadow .25s ease;
+        }
+        .glow-card:hover { border-color: rgba(255,255,255,.1); box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+
+        .header { text-align: center; margin-bottom: 2rem; }
+        .badge { display: inline-flex; align-items: center; gap: .75rem; background: linear-gradient(135deg, #f97316, #f59e0b); padding: .5rem 1.5rem; border-radius: 9999px; margin-bottom: 1rem; box-shadow: 0 4px 14px rgba(249,115,22,.35); }
+        .badge span { color: #fff; font-weight: 700; font-size: 1.125rem; }
+        h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 700; margin-bottom: .5rem; line-height: 1.15; letter-spacing: -.025em; }
+        .subtitle { color: #a3a3a3; font-size: clamp(.9rem, 2.5vw, 1.125rem); max-width: 520px; margin: 0 auto; }
+
+        .grid { display: grid; grid-template-columns: 1fr 420px; gap: 1.75rem; margin-bottom: 2rem; align-items: start; }
+        @media (max-width: 1080px) { .grid { grid-template-columns: 1fr; } .results-col { position: static !important; } }
+        @media (max-width: 640px) { .upgrade-banner-inner { flex-direction: column; text-align: center; } .two-col, .three-col { grid-template-columns: 1fr !important; } body { padding: 1rem .75rem; } .glow-card { padding: 1.25rem; } .bottom-grid { grid-template-columns: 1fr !important; } }
+
+        .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 1.25rem; display: flex; align-items: center; gap: .5rem; color: #fafafa; }
+        .section-label { font-size: .6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: rgba(249,115,22,.65); margin-bottom: .5rem; }
+
+        .form-group { margin-bottom: .875rem; }
+        label { color: #d4d4d4; display: block; margin-bottom: .375rem; font-weight: 500; font-size: .8125rem; }
+        select, input[type="number"], input[type="text"], textarea {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 10px;
+            color: #fafafa;
+            padding: .6875rem .875rem;
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9375rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        input[type="number"] { -moz-appearance: textfield; font-feature-settings: 'tnum'; }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        textarea { resize: none; }
+        select:focus, input:focus, textarea:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.12); }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,.2); }
+        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23737373' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right .75rem center; background-repeat: no-repeat; background-size: 1.25em; padding-right: 2.5rem; }
+        option { background: #171717; color: #fafafa; }
+        small { display: block; margin-top: .25rem; font-size: .6875rem; color: #525252; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: .875rem; }
+        .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+
+        .checkbox-container { display: flex; align-items: center; gap: .625rem; padding: .5rem .75rem; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; cursor: pointer; transition: all .2s; }
+        .checkbox-container:hover { background: rgba(249,115,22,.04); border-color: rgba(249,115,22,.12); }
+        .checkbox-container.active { background: rgba(249,115,22,.05); border-color: rgba(249,115,22,.18); }
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #f97316; border-radius: 4px; flex-shrink: 0; }
+        .surcharge-amount { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .3s ease, opacity .2s ease, margin .3s ease; margin-top: 0; }
+        .surcharge-amount.open { max-height: 60px; opacity: 1; margin-top: .5rem; }
+
+        .icon { width: 20px; height: 20px; display: inline-block; flex-shrink: 0; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+        .anim-in { animation: slideIn .5s cubic-bezier(.16,1,.3,1) both; }
+        .anim-in-1 { animation-delay: .05s; }
+        .anim-in-2 { animation-delay: .12s; }
+        .anim-in-3 { animation-delay: .18s; }
+        .anim-in-4 { animation-delay: .24s; }
+        .fade-section { animation: fadeIn .25s ease-out; }
+
+        .progress-bar { width: 100%; height: 10px; background: rgba(255,255,255,.06); border-radius: 9999px; overflow: hidden; }
+        .progress-fill { height: 100%; transition: width .6s cubic-bezier(.16,1,.3,1); border-radius: 9999px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: .625rem .5rem; text-align: left; font-size: .875rem; }
+        th { color: #a3a3a3; font-weight: 600; font-size: .6875rem; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid rgba(255,255,255,.06); }
+        td { color: #a3a3a3; border-bottom: 1px solid rgba(255,255,255,.03); }
+        tr:last-child td { border-bottom: none; }
+        .price-table td:last-child { text-align: right; color: #f97316; font-weight: 600; }
+
+        .footer { text-align: center; margin-top: 3rem; padding: 2rem 1.5rem; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.04); border-radius: 16px; }
+        .footer p { color: #525252; font-size: .8125rem; }
+        .footer a { color: #f97316; text-decoration: none; font-weight: 600; }
+        .footer a:hover { text-decoration: underline; }
+
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; margin-bottom: 2rem; }
+
+        .upgrade-banner { background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(249,115,22,.25); }
+        .upgrade-banner-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .875rem; }
+        .upgrade-banner-text { color: #fff; font-weight: 500; font-size: .875rem; display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 260px; }
+        .upgrade-badge { background: rgba(0,0,0,.3); color: #fff; font-weight: 800; font-size: .625rem; padding: .2rem .5rem; border-radius: 6px; text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0; }
+        .upgrade-cta { background: #fff; color: #ea580c; font-weight: 700; padding: .5rem 1rem; border-radius: 8px; text-decoration: none; white-space: nowrap; font-size: .8125rem; transition: all .2s; flex-shrink: 0; }
+        .upgrade-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+        .upgrade-cta code { background: rgba(234,88,12,.12); padding: .1rem .35rem; border-radius: 3px; font-size: .75rem; }
+
+        .dyia-results-cta { background: rgba(249,115,22,.05); border: 1px solid rgba(249,115,22,.12); border-radius: 14px; padding: 1.25rem; margin-top: 1.25rem; text-align: center; }
+        .dyia-results-cta a { display: inline-block; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; font-weight: 700; padding: .5rem 1.25rem; border-radius: 8px; text-decoration: none; font-size: .8125rem; transition: all .2s; box-shadow: 0 2px 10px rgba(249,115,22,.2); }
+        .dyia-results-cta a:hover { box-shadow: 0 4px 16px rgba(249,115,22,.35); transform: translateY(-1px); }
+
+        .cost-bar-wrap { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.05); }
+        .cost-bar { display: flex; height: 8px; border-radius: 9999px; overflow: hidden; gap: 1px; }
+        .cost-bar div { transition: width .5s cubic-bezier(.16,1,.3,1); }
+        .cost-legend { display: flex; flex-wrap: wrap; gap: .25rem .625rem; margin-top: .5rem; }
+        .cost-legend-item { display: flex; align-items: center; gap: .3rem; font-size: .6875rem; color: rgba(255,255,255,.35); }
+        .cost-legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.05); }
+        .metric-label { font-size: .6875rem; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.25); font-weight: 600; margin-bottom: .25rem; }
+        .metric-value { font-size: 1.25rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; font-feature-settings: 'tnum'; transition: color .3s; }
+        .metric-hint { font-size: .625rem; color: rgba(255,255,255,.18); margin-top: .125rem; }
+
+        .save-btn { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .75rem; border-radius: 12px; background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; font-weight: 600; font-size: .8125rem; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(249,115,22,.2); transition: all .2s; }
+        .save-btn:hover { box-shadow: 0 6px 20px rgba(249,115,22,.3); transform: translateY(-1px); }
+        .save-btn:active { transform: scale(.98); }
+
+        .modal-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); animation: fadeIn .15s ease-out; }
+        .modal-panel { position: relative; width: 100%; max-width: 26rem; background: #131315; border: 1px solid rgba(255,255,255,.08); border-radius: 18px; padding: 1.5rem; box-shadow: 0 24px 64px rgba(0,0,0,.5); animation: scaleIn .25s cubic-bezier(.16,1,.3,1); }
+
+        .quote-row { display: flex; align-items: center; gap: .625rem; padding: .625rem .875rem; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05); border-radius: 10px; margin-bottom: .375rem; transition: background .15s; }
+        .quote-row:hover { background: rgba(255,255,255,.04); }
+        .quote-row:hover .quote-del { opacity: 1; }
+        .quote-del { opacity: 0; background: none; border: none; color: rgba(255,255,255,.2); cursor: pointer; padding: .25rem; transition: all .15s; flex-shrink: 0; font-size: 1rem; }
+        .quote-del:hover { color: #ef4444; }
+
+        .mobile-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; display: none; background: rgba(9,9,11,.95); backdrop-filter: blur(16px); border-top: 1px solid rgba(255,255,255,.08); padding: .625rem 1rem; padding-bottom: calc(.625rem + env(safe-area-inset-bottom, 0px)); }
+        @media (max-width: 1080px) { .mobile-bar.visible { display: block; } .mobile-pad { padding-bottom: 5rem; } }
+
+        .tax-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.05); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .tax-input-wrap { position: relative; width: 5.5rem; }
+        .tax-input-wrap input { text-align: right; padding-right: 1.75rem; }
+        .tax-input-wrap .pct { position: absolute; right: .75rem; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.25); font-size: .8125rem; pointer-events: none; }
+
+        .results-col { position: sticky; top: 1.5rem; align-self: start; }
+
+        .btn-secondary { padding: .6875rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.08); background: none; color: rgba(255,255,255,.4); font-weight: 600; font-size: .8125rem; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+        .btn-secondary:hover { border-color: rgba(255,255,255,.15); color: rgba(255,255,255,.6); background: rgba(255,255,255,.03); }
+        .btn-secondary:active { transform: scale(.98); }
+
+        .btn-orange-outline { padding: .6875rem; border-radius: 10px; background: rgba(249,115,22,.08); border: 1px solid rgba(249,115,22,.2); color: #f97316; font-weight: 600; font-size: .8125rem; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+        .btn-orange-outline:hover { background: rgba(249,115,22,.12); }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="upgrade-banner" id="promoBanner">
+        <div class="upgrade-banner anim-in" id="promoBanner">
             <div class="upgrade-banner-inner">
                 <div class="upgrade-banner-text">
-                    <span class="upgrade-badge">Upgraded</span>
+                    <span class="upgrade-badge">New</span>
                     <span>A smarter version of this tool is now inside <strong>dyia</strong> — the AI-powered business manager for service pros.</span>
                 </div>
-                <a href="https://dyia.io" target="_blank" rel="noopener" class="upgrade-cta">
-                    $10 off Pro with code <code>GUMROAD</code> — expires 4/15 &rarr;
-                </a>
+                <a href="https://dyia.io" target="_blank" rel="noopener" class="upgrade-cta">$10 off with code <code>GUMROAD</code> &rarr;</a>
             </div>
         </div>
 
-        <div class="header">
+        <div class="header anim-in anim-in-1">
             <div class="badge">
                 <svg class="icon" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 <span>Profit Calculator</span>
             </div>
-            <h1>Junk Removal Pricing Analyzer</h1>
-            <p class="subtitle">Quote any job — see margins, hourly rates, and save quotes instantly.</p>
-            <p style="color:#737373;font-size:.8rem;margin-top:.5rem">Powered by <a href="https://dyia.io" target="_blank" rel="noopener" style="color:#f97316;text-decoration:none;font-weight:600">dyia</a></p>
+            <h1>Know your real profit.</h1>
+            <p class="subtitle">Quote any job — see margins, hourly rates, breakeven, and save quotes instantly.</p>
+            <p style="color:#525252;font-size:.75rem;margin-top:.625rem">Powered by <a href="https://dyia.io" target="_blank" rel="noopener" style="color:#f97316;text-decoration:none;font-weight:600">dyia</a></p>
         </div>
 
         <div class="grid">
-            <!-- LEFT COLUMN: INPUTS -->
-            <div>
-                <div class="glow-card">
+            <div class="mobile-pad">
+                <!-- JOB DETAILS -->
+                <div class="glow-card anim-in anim-in-2">
                     <h2 class="section-title">
-                        <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                        <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         Job Details
                     </h2>
-
-                    <div class="two-col" style="margin-bottom:1rem">
-                        <div class="form-group" style="margin-bottom:0"><label>Customer name (optional)</label><input type="text" id="customerName" placeholder="e.g. John Smith"></div>
-                        <div class="form-group" style="margin-bottom:0"><label>Job address (optional)</label><input type="text" id="jobAddress" placeholder="123 Main St"></div>
+                    <div class="two-col" style="margin-bottom:.875rem">
+                        <div class="form-group" style="margin:0"><label>Customer name (optional)</label><input type="text" id="customerName" placeholder="e.g. John Smith"></div>
+                        <div class="form-group" style="margin:0"><label>Job address (optional)</label><input type="text" id="jobAddress" placeholder="123 Main St"></div>
                     </div>
-
-                    <div class="two-col" style="margin-bottom:1rem">
-                        <div class="form-group" style="margin-bottom:0">
+                    <div class="two-col" style="margin-bottom:.875rem">
+                        <div class="form-group" style="margin:0">
                             <p class="section-label">Job Type</p>
-                            <select id="jobType">
-                                <option value="volume">Volume-Based (by truck load)</option>
-                                <option value="multipleLoads">Multiple Full Loads</option>
-                                <option value="specialty">Specialty Item Removal</option>
-                                <option value="mixed">Mixed (Specialty + Volume)</option>
-                            </select>
+                            <select id="jobType"><option value="volume">Volume-Based (by truck load)</option><option value="multipleLoads">Multiple Full Loads</option><option value="specialty">Specialty Item Removal</option><option value="mixed">Mixed (Specialty + Volume)</option></select>
                         </div>
-                        <div class="form-group" style="margin-bottom:0">
-                            <label>Estimated hours on-site</label>
-                            <input type="number" id="estimatedHours" value="0" min="0" step="0.5" placeholder="e.g. 2">
-                            <small>Used to calculate your $/hr</small>
-                        </div>
+                        <div class="form-group" style="margin:0"><label>Estimated hours on-site</label><input type="number" id="estimatedHours" min="0" step="0.5" placeholder="e.g. 2"><small>Used to calculate your $/hr</small></div>
                     </div>
 
-                    <!-- Volume -->
-                    <div id="volumeSection">
-                        <div class="two-col">
-                            <div class="form-group"><label>Load Size</label><select id="analyzeLoadSize"><option value="minimum">Minimum Pickup (1-2 items)</option><option value="quarter">1/4 Load</option><option value="half" selected>1/2 Load</option><option value="threeQuarter">3/4 Load</option><option value="full">Full Load</option></select></div>
-                            <div class="form-group"><label>Your Price ($)</label><input type="number" id="loadPrice" value="0" min="0"></div>
-                        </div>
+                    <div id="volumeSection" class="fade-section">
+                        <div class="two-col"><div class="form-group"><label>Load Size</label><select id="analyzeLoadSize"><option value="minimum">Minimum Pickup (1-2 items)</option><option value="quarter">1/4 Load</option><option value="half" selected>1/2 Load</option><option value="threeQuarter">3/4 Load</option><option value="full">Full Load</option></select></div><div class="form-group"><label>Your Price ($)</label><input type="number" id="loadPrice" min="0" placeholder="0"></div></div>
                     </div>
-
-                    <!-- Multiple Loads -->
                     <div id="multipleLoadsSection" style="display:none">
-                        <div style="background:rgba(249,115,22,.08);border-left:3px solid #f97316;padding:1rem;border-radius:8px;margin-bottom:1rem">
-                            <h4 style="color:#f97316;font-weight:600;margin-bottom:.5rem">📦 Multiple Full Loads</h4>
-                            <p style="margin:0;font-size:.875rem">Price large jobs requiring multiple truck trips.</p>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem">
-                            <div class="form-group"><label># of Loads</label><input type="number" id="numLoads" value="1" min="1" max="10"></div>
-                            <div class="form-group"><label>Price/Load ($)</label><input type="number" id="pricePerLoad" value="0" min="0"></div>
-                            <div class="form-group"><label>Discount (%)</label><input type="number" id="loadDiscount" value="0" min="0" max="50"></div>
-                        </div>
-                        <div style="background:rgba(255,255,255,.04);padding:1rem;border-radius:8px;margin-top:.75rem">
-                            <div style="display:flex;justify-content:space-between;margin-bottom:.5rem"><span style="color:rgba(255,255,255,.5);font-size:.875rem">Loads:</span><span style="color:#fff;font-weight:600" id="displayNumLoads">1 load</span></div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:.5rem"><span style="color:rgba(255,255,255,.5);font-size:.875rem">Price per load:</span><span style="color:#fff;font-weight:600" id="displayPricePerLoad">$0</span></div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:.5rem"><span style="color:rgba(255,255,255,.5);font-size:.875rem">Discount:</span><span style="color:#fbbf24;font-weight:600" id="displayDiscount">0%</span></div>
-                            <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:2px solid rgba(255,255,255,.1)"><span style="color:#f97316;font-weight:700">Total Quote:</span><span style="color:#f97316;font-weight:700;font-size:1.125rem" id="displayMultiLoadTotal">$0.00</span></div>
-                        </div>
+                        <div style="background:rgba(249,115,22,.06);border-left:3px solid rgba(249,115,22,.4);padding:.875rem;border-radius:10px;margin-bottom:.875rem"><h4 style="color:#f97316;font-weight:600;font-size:.8125rem;margin-bottom:.25rem">📦 Multiple Full Loads</h4><p style="margin:0;font-size:.8125rem;color:#a3a3a3">Price large jobs requiring multiple truck trips.</p></div>
+                        <div class="three-col"><div class="form-group"><label># of Loads</label><input type="number" id="numLoads" value="1" min="1" max="10"></div><div class="form-group"><label>Price/Load ($)</label><input type="number" id="pricePerLoad" min="0" placeholder="0"></div><div class="form-group"><label>Discount (%)</label><input type="number" id="loadDiscount" min="0" max="50" placeholder="0"></div></div>
+                        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);padding:.875rem;border-radius:10px;margin-top:.625rem;font-size:.8125rem"><div style="display:flex;justify-content:space-between;margin-bottom:.375rem"><span style="color:#737373">Loads:</span><span style="color:#e5e5e5;font-weight:600" id="displayNumLoads">1 load</span></div><div style="display:flex;justify-content:space-between;margin-bottom:.375rem"><span style="color:#737373">Price per load:</span><span style="color:#e5e5e5;font-weight:600" id="displayPricePerLoad">$0</span></div><div style="display:flex;justify-content:space-between;margin-bottom:.375rem"><span style="color:#737373">Discount:</span><span style="color:#fbbf24;font-weight:600" id="displayDiscount">0%</span></div><div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.06)"><span style="color:#f97316;font-weight:700">Total:</span><span style="color:#f97316;font-weight:700" id="displayMultiLoadTotal">$0.00</span></div></div>
                     </div>
-
-                    <!-- Specialty -->
-                    <div id="specialtySection" style="display:none">
-                        <div class="two-col">
-                            <div class="form-group"><label>Specialty Item</label><select id="specialtyType"><option value="hottub">Hot Tub Removal</option><option value="trampoline">Trampoline</option><option value="playset">Play Set</option><option value="shed">Shed/Demo</option><option value="pool">Above Ground Pool</option><option value="piano">Piano</option><option value="custom">Custom Item</option></select></div>
-                            <div class="form-group"><label>Your Price ($)</label><input type="number" id="specialtyPrice" value="0" min="0"></div>
-                        </div>
-                    </div>
-
-                    <!-- Mixed -->
+                    <div id="specialtySection" style="display:none"><div class="two-col"><div class="form-group"><label>Specialty Item</label><select id="specialtyType"><option value="hottub">Hot Tub Removal</option><option value="trampoline">Trampoline</option><option value="playset">Play Set</option><option value="shed">Shed/Demo</option><option value="pool">Above Ground Pool</option><option value="piano">Piano</option><option value="custom">Custom Item</option></select></div><div class="form-group"><label>Your Price ($)</label><input type="number" id="specialtyPrice" min="0" placeholder="0"></div></div></div>
                     <div id="mixedSection" style="display:none">
-                        <div style="background:rgba(249,115,22,.08);border-left:3px solid #f97316;padding:1rem;border-radius:8px;margin-bottom:1rem">
-                            <h4 style="color:#f97316;font-weight:600;margin-bottom:.5rem">Mixed Job Pricing</h4>
-                            <p style="margin:0;font-size:.875rem">Enter pricing for both the specialty item and additional volume.</p>
-                        </div>
-                        <div class="two-col">
-                            <div class="form-group"><label>Specialty Item</label><select id="mixedSpecialtyType"><option value="hottub">Hot Tub</option><option value="trampoline">Trampoline</option><option value="playset">Play Set</option><option value="shed">Shed/Demo</option><option value="pool">Pool</option><option value="piano">Piano</option><option value="custom">Custom</option></select></div>
-                            <div class="form-group"><label>Specialty Price ($)</label><input type="number" id="mixedSpecialtyPrice" value="0" min="0"></div>
-                        </div>
-                        <div class="two-col">
-                            <div class="form-group"><label>Additional Load Size</label><select id="mixedLoadSize"><option value="none">None</option><option value="minimum">Minimum</option><option value="quarter" selected>1/4 Load</option><option value="half">1/2 Load</option><option value="threeQuarter">3/4 Load</option><option value="full">Full Load</option></select></div>
-                            <div class="form-group"><label>Additional Price ($)</label><input type="number" id="mixedLoadPrice" value="0" min="0"></div>
-                        </div>
+                        <div style="background:rgba(249,115,22,.06);border-left:3px solid rgba(249,115,22,.4);padding:.875rem;border-radius:10px;margin-bottom:.875rem"><h4 style="color:#f97316;font-weight:600;font-size:.8125rem;margin-bottom:.25rem">Mixed Job Pricing</h4><p style="margin:0;font-size:.8125rem;color:#a3a3a3">Enter pricing for both the specialty item and additional volume.</p></div>
+                        <div class="two-col" style="margin-bottom:.5rem"><div class="form-group"><label>Specialty Item</label><select id="mixedSpecialtyType"><option value="hottub">Hot Tub</option><option value="trampoline">Trampoline</option><option value="playset">Play Set</option><option value="shed">Shed/Demo</option><option value="pool">Pool</option><option value="piano">Piano</option><option value="custom">Custom</option></select></div><div class="form-group"><label>Specialty Price ($)</label><input type="number" id="mixedSpecialtyPrice" min="0" placeholder="0"></div></div>
+                        <div class="two-col"><div class="form-group"><label>Additional Load Size</label><select id="mixedLoadSize"><option value="none">None</option><option value="minimum">Minimum</option><option value="quarter" selected>1/4 Load</option><option value="half">1/2 Load</option><option value="threeQuarter">3/4 Load</option><option value="full">Full Load</option></select></div><div class="form-group"><label>Additional Price ($)</label><input type="number" id="mixedLoadPrice" min="0" placeholder="0"></div></div>
                     </div>
 
-                    <!-- Surcharges -->
-                    <p class="section-label" style="margin-top:1.5rem">Surcharges</p>
+                    <p class="section-label" style="margin-top:1.25rem">Surcharges</p>
                     <div class="two-col">
-                        <div><label class="checkbox-container"><input type="checkbox" id="applyStairs"><span style="flex:1">Stairs</span></label><div style="padding-left:2rem;margin-top:.25rem"><input type="number" id="stairsCharge" value="0" min="0" style="padding:.5rem" placeholder="$ charge"></div></div>
-                        <div><label class="checkbox-container"><input type="checkbox" id="applyDisassembly"><span style="flex:1">Disassembly</span></label><div style="padding-left:2rem;margin-top:.25rem"><input type="number" id="disassemblyCharge" value="0" min="0" style="padding:.5rem" placeholder="$ charge"></div></div>
-                        <div><label class="checkbox-container"><input type="checkbox" id="applyExtraLabor"><span style="flex:1">Heavy Items</span></label><div style="padding-left:2rem;margin-top:.25rem"><input type="number" id="extraLaborCharge" value="0" min="0" style="padding:.5rem" placeholder="$ charge"></div></div>
-                        <div><label class="checkbox-container"><input type="checkbox" id="applyDemolition"><span style="flex:1">Demolition</span></label><div style="padding-left:2rem;margin-top:.25rem"><input type="number" id="demolitionCharge" value="0" min="0" style="padding:.5rem" placeholder="$ charge"></div></div>
+                        <div><label class="checkbox-container" id="stairsToggle"><input type="checkbox" id="applyStairs"><span style="flex:1;font-size:.8125rem">Stairs</span></label><div class="surcharge-amount" id="stairsAmountWrap"><div style="padding-left:1.75rem"><input type="number" id="stairsCharge" min="0" style="padding:.5rem .75rem;font-size:.8125rem" placeholder="$ amount"></div></div></div>
+                        <div><label class="checkbox-container" id="disassemblyToggle"><input type="checkbox" id="applyDisassembly"><span style="flex:1;font-size:.8125rem">Disassembly</span></label><div class="surcharge-amount" id="disassemblyAmountWrap"><div style="padding-left:1.75rem"><input type="number" id="disassemblyCharge" min="0" style="padding:.5rem .75rem;font-size:.8125rem" placeholder="$ amount"></div></div></div>
+                        <div><label class="checkbox-container" id="extraLaborToggle"><input type="checkbox" id="applyExtraLabor"><span style="flex:1;font-size:.8125rem">Heavy Items</span></label><div class="surcharge-amount" id="extraLaborAmountWrap"><div style="padding-left:1.75rem"><input type="number" id="extraLaborCharge" min="0" style="padding:.5rem .75rem;font-size:.8125rem" placeholder="$ amount"></div></div></div>
+                        <div><label class="checkbox-container" id="demolitionToggle"><input type="checkbox" id="applyDemolition"><span style="flex:1;font-size:.8125rem">Demolition</span></label><div class="surcharge-amount" id="demolitionAmountWrap"><div style="padding-left:1.75rem"><input type="number" id="demolitionCharge" min="0" style="padding:.5rem .75rem;font-size:.8125rem" placeholder="$ amount"></div></div></div>
                     </div>
-
-                    <!-- Job notes -->
-                    <div class="form-group" style="margin-top:1.25rem"><label>Job notes (optional)</label><textarea id="jobNotes" rows="2" placeholder="Describe the job, special instructions, access notes..."></textarea></div>
+                    <div class="form-group" style="margin-top:1rem;margin-bottom:0"><label>Job notes (optional)</label><textarea id="jobNotes" rows="2" placeholder="Describe the job, special instructions, access notes..."></textarea></div>
                 </div>
 
-                <!-- COSTS CARD -->
-                <div class="glow-card" style="margin-top:1.5rem">
+                <!-- COSTS -->
+                <div class="glow-card anim-in anim-in-3" style="margin-top:1.25rem">
                     <h2 class="section-title">
                         <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Your Costs
                     </h2>
                     <div class="two-col">
-                        <div class="form-group"><label>Landfill / Dump ($)</label><input type="number" id="costLandfill" value="0" min="0"><small>Enter 0 if donating</small></div>
-                        <div class="form-group"><label>Dumpster Rental ($)</label><input type="number" id="costDumpster" value="0" min="0"></div>
-                        <div class="form-group"><label>Equipment Rental ($)</label><input type="number" id="costDemoMachine" value="0" min="0"><small>Excavator, bobcat, etc.</small></div>
-                        <div class="form-group"><label>Truck Rental ($)</label><input type="number" id="costTruckRental" value="0" min="0"></div>
-                        <div class="form-group"><label>Fuel ($)</label><input type="number" id="costFuel" value="0" min="0"></div>
-                        <div class="form-group"><label>Labor / Wages ($)</label><input type="number" id="costLabor" value="0" min="0"><small>Rate × hours × workers</small></div>
+                        <div class="form-group"><label>Landfill / Dump ($)</label><input type="number" id="costLandfill" min="0" placeholder="0"><small>Enter 0 if donating</small></div>
+                        <div class="form-group"><label>Dumpster Rental ($)</label><input type="number" id="costDumpster" min="0" placeholder="0"></div>
+                        <div class="form-group"><label>Equipment Rental ($)</label><input type="number" id="costDemoMachine" min="0" placeholder="0"><small>Excavator, bobcat, etc.</small></div>
+                        <div class="form-group"><label>Truck Rental ($)</label><input type="number" id="costTruckRental" min="0" placeholder="0"></div>
+                        <div class="form-group"><label>Fuel ($)</label><input type="number" id="costFuel" min="0" placeholder="0"></div>
+                        <div class="form-group"><label>Labor / Wages ($)</label><input type="number" id="costLabor" min="0" placeholder="0"><small>Rate × hours × workers</small></div>
                     </div>
-
-                    <!-- Cost breakdown bar -->
-                    <div class="cost-bar-wrap" id="costBarWrap" style="display:none">
-                        <p style="font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.25);margin-bottom:.625rem">Cost Breakdown</p>
-                        <div class="cost-bar" id="costBar"></div>
-                        <div class="cost-legend" id="costLegend"></div>
-                    </div>
-
-                    <!-- Tax -->
-                    <div class="tax-section">
-                        <div style="flex:1"><p style="font-size:.875rem;font-weight:500;color:rgba(255,255,255,.7)">Add tax to quote</p><p style="font-size:.6875rem;color:rgba(255,255,255,.3)">Optional — adds sales tax on top of your price</p></div>
-                        <div class="tax-input-wrap"><input type="number" id="taxRate" value="0" min="0" max="100" step="0.1" placeholder="0"><span class="pct">%</span></div>
-                    </div>
-
-                    <div style="display:flex;gap:.75rem;margin-top:1.25rem">
-                        <button type="button" id="clearBtn" style="flex:1;padding:.75rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(255,255,255,.4);font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s">Clear all</button>
-                        <button type="button" id="scrollResultsBtn" style="flex:1;padding:.75rem;border-radius:12px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);color:#f97316;font-weight:600;font-size:.875rem;cursor:pointer;display:none;transition:all .2s">See results ↓</button>
+                    <div class="cost-bar-wrap" id="costBarWrap" style="display:none"><p style="font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.2);margin-bottom:.5rem">Cost Breakdown</p><div class="cost-bar" id="costBar"></div><div class="cost-legend" id="costLegend"></div></div>
+                    <div class="tax-section"><div style="flex:1"><p style="font-size:.8125rem;font-weight:500;color:rgba(255,255,255,.6)">Add tax to quote</p><p style="font-size:.6875rem;color:rgba(255,255,255,.2)">Optional — sales tax on top of your price</p></div><div class="tax-input-wrap"><input type="number" id="taxRate" min="0" max="100" step="0.1" placeholder="0"><span class="pct">%</span></div></div>
+                    <div style="display:flex;gap:.625rem;margin-top:1rem">
+                        <button type="button" id="clearBtn" class="btn-secondary" style="flex:1">Clear all</button>
+                        <button type="button" id="scrollResultsBtn" class="btn-orange-outline" style="flex:1;display:none">See results ↓</button>
                     </div>
                 </div>
 
                 <!-- QUOTE HISTORY -->
-                <div class="glow-card" id="quoteHistoryCard" style="margin-top:1.5rem;display:none">
-                    <h2 class="section-title">
-                        <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>Saved Quotes (<span id="quoteCount">0</span>)</span>
-                    </h2>
+                <div class="glow-card" id="quoteHistoryCard" style="margin-top:1.25rem;display:none">
+                    <h2 class="section-title"><svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Saved Quotes (<span id="quoteCount">0</span>)</span></h2>
                     <div id="quoteList"></div>
-                    <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.06);font-size:.6875rem;color:rgba(255,255,255,.25);display:flex;align-items:center;gap:.5rem">
-                        <span>Quotes saved locally on this device.</span>
-                        <a href="https://dyia.io" target="_blank" rel="noopener" style="color:rgba(249,115,22,.6);text-decoration:none">Sync everywhere with dyia →</a>
-                    </div>
+                    <div style="margin-top:.625rem;padding-top:.625rem;border-top:1px solid rgba(255,255,255,.04);font-size:.6875rem;color:rgba(255,255,255,.2)">Saved locally. <a href="https://dyia.io" target="_blank" rel="noopener" style="color:rgba(249,115,22,.5);text-decoration:none">Sync with dyia →</a></div>
                 </div>
 
                 <!-- PRO TIPS -->
-                <div class="glow-card" style="margin-top:1.5rem">
-                    <h4 style="color:#f97316;font-size:1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;font-family:'Space Grotesk',sans-serif">
-                        <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                        Pro Tips
-                    </h4>
-                    <div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.1);padding:1rem;border-radius:10px;margin-bottom:1rem">
-                        <p style="color:#f97316;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">Debris Type = Profit</p>
-                        <p style="color:rgba(255,255,255,.6);font-size:.875rem;line-height:1.6"><strong style="color:#ef4444">Higher Price:</strong> Wood, construction, concrete → landfill fees</p>
-                        <p style="color:rgba(255,255,255,.6);font-size:.875rem;line-height:1.6;margin-top:.25rem"><strong style="color:#4ade80">Lower Price:</strong> Furniture, appliances → donate (no fees)</p>
+                <div class="glow-card anim-in anim-in-4" style="margin-top:1.25rem">
+                    <h4 style="color:#f97316;font-size:.9375rem;font-weight:600;margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem;font-family:'Space Grotesk',sans-serif"><svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>Pro Tips</h4>
+                    <div style="background:rgba(249,115,22,.04);border:1px solid rgba(249,115,22,.08);padding:.875rem;border-radius:10px;margin-bottom:.875rem">
+                        <p style="color:#f97316;font-weight:600;font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem">Debris Type = Profit</p>
+                        <p style="color:#a3a3a3;font-size:.8125rem;line-height:1.6"><strong style="color:#ef4444">Higher Price:</strong> Wood, construction, concrete → landfill fees</p>
+                        <p style="color:#a3a3a3;font-size:.8125rem;line-height:1.6;margin-top:.125rem"><strong style="color:#4ade80">Lower Price:</strong> Furniture, appliances → donate (no fees)</p>
                     </div>
-                    <ul style="color:rgba(255,255,255,.6);font-size:.875rem;line-height:1.6;padding-left:0;list-style:none">
-                        <li style="display:flex;gap:.5rem;margin-bottom:.5rem"><span style="color:#f97316">•</span>Always quote a range — confirm on-site</li>
-                        <li style="display:flex;gap:.5rem;margin-bottom:.5rem"><span style="color:#f97316">•</span>Track your real costs weekly</li>
-                        <li style="display:flex;gap:.5rem"><span style="color:#f97316">•</span>Offer 10-15% multi-load discounts to close bigger jobs</li>
+                    <ul style="color:#a3a3a3;font-size:.8125rem;line-height:1.6;padding:0;list-style:none">
+                        <li style="display:flex;gap:.375rem;margin-bottom:.375rem"><span style="color:#f97316">•</span>Always quote a range — confirm on-site</li>
+                        <li style="display:flex;gap:.375rem;margin-bottom:.375rem"><span style="color:#f97316">•</span>Track your real costs weekly</li>
+                        <li style="display:flex;gap:.375rem"><span style="color:#f97316">•</span>Offer 10-15% multi-load discounts to close bigger jobs</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: RESULTS -->
-            <div class="results-col" id="resultsCol">
-                <!-- Margin card -->
+            <!-- RESULTS COLUMN -->
+            <div class="results-col anim-in anim-in-3" id="resultsCol">
                 <div class="glow-card" style="padding:0;overflow:hidden">
                     <div style="position:relative;padding:1.5rem 1.5rem 1.25rem;text-align:center">
-                        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(249,115,22,.04),transparent);pointer-events:none"></div>
-                        <p style="font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);margin-bottom:.75rem;position:relative">Gross Profit Margin</p>
-                        <div id="currentMarginPercent" style="font-size:3.5rem;font-weight:700;font-family:'Space Grotesk',sans-serif;line-height:1;position:relative;font-feature-settings:'tnum'">0.0%</div>
+                        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(249,115,22,.03),transparent);pointer-events:none"></div>
+                        <p style="font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.25);margin-bottom:.75rem;position:relative">Gross Profit Margin</p>
+                        <div id="currentMarginPercent" style="font-size:3.25rem;font-weight:700;font-family:'Space Grotesk',sans-serif;line-height:1;position:relative;font-feature-settings:'tnum';transition:color .3s">0.0%</div>
                     </div>
-                    <div style="padding:0 1.5rem .5rem">
-                        <div class="progress-bar"><div class="progress-fill" id="currentMarginBar" style="width:0%;background:linear-gradient(90deg,#f97316,#f59e0b)"></div></div>
-                        <div style="display:flex;justify-content:space-between;font-size:.625rem;color:rgba(255,255,255,.25);margin-top:.375rem;padding:0 .125rem"><span>0%</span><span>30%</span><span>50%</span><span>100%</span></div>
+                    <div style="padding:0 1.5rem .375rem"><div class="progress-bar"><div class="progress-fill" id="currentMarginBar" style="width:0%;background:linear-gradient(90deg,#f97316,#f59e0b)"></div></div><div style="display:flex;justify-content:space-between;font-size:.5625rem;color:rgba(255,255,255,.2);margin-top:.25rem;padding:0 .125rem"><span>0%</span><span>30%</span><span>50%</span><span>100%</span></div></div>
+                    <div style="padding:.25rem 1.5rem .875rem" id="marginStatus"></div>
+                    <div style="border-top:1px solid rgba(255,255,255,.05);padding:.875rem 1.5rem;font-size:.8125rem">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem"><span style="color:rgba(255,255,255,.35)">Subtotal</span><span style="font-weight:500;color:rgba(255,255,255,.75);font-feature-settings:'tnum'" id="displaySubtotal">$0.00</span></div>
+                        <div id="taxRow" style="display:none;justify-content:space-between;margin-bottom:.5rem;color:rgba(255,255,255,.35)"><span id="taxLabel">Tax (0%)</span><span style="font-feature-settings:'tnum'" id="displayTax">+$0.00</span></div>
+                        <div id="customerPaysRow" style="display:none;justify-content:space-between;margin-bottom:.5rem"><span style="color:rgba(255,255,255,.45);font-weight:500">Customer pays</span><span style="font-weight:600;color:rgba(255,255,255,.85);font-feature-settings:'tnum'" id="displayCustomerPays">$0.00</span></div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem"><span style="color:rgba(255,255,255,.35)">Your costs</span><span style="font-weight:500;color:rgba(239,68,68,.7);font-feature-settings:'tnum'" id="displayCosts">$0.00</span></div>
+                        <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.05)"><span style="color:rgba(255,255,255,.45);font-weight:500">Your profit</span><span style="font-weight:700;font-size:1.0625rem;font-feature-settings:'tnum'" id="displayProfit">$0.00</span></div>
                     </div>
-                    <div style="padding:.25rem 1.5rem 1rem" id="marginStatus"></div>
-
-                    <!-- Breakdown -->
-                    <div style="border-top:1px solid rgba(255,255,255,.06);padding:1rem 1.5rem;font-size:.875rem" id="breakdownSection">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:.625rem"><span style="color:rgba(255,255,255,.4)">Subtotal</span><span style="font-weight:500;color:rgba(255,255,255,.8);font-feature-settings:'tnum'" id="displaySubtotal">$0.00</span></div>
-                        <div id="taxRow" style="display:none;justify-content:space-between;margin-bottom:.625rem;color:rgba(255,255,255,.4)"><span id="taxLabel">Tax (0%)</span><span style="font-feature-settings:'tnum'" id="displayTax">+$0.00</span></div>
-                        <div id="customerPaysRow" style="display:none;justify-content:space-between;margin-bottom:.625rem"><span style="color:rgba(255,255,255,.5);font-weight:500">Customer pays</span><span style="font-weight:600;color:rgba(255,255,255,.9);font-feature-settings:'tnum'" id="displayCustomerPays">$0.00</span></div>
-                        <div style="display:flex;justify-content:space-between;margin-bottom:.625rem"><span style="color:rgba(255,255,255,.4)">Your costs</span><span style="font-weight:500;color:rgba(239,68,68,.8);font-feature-settings:'tnum'" id="displayCosts">$0.00</span></div>
-                        <div style="display:flex;justify-content:space-between;padding-top:.625rem;border-top:1px solid rgba(255,255,255,.06)"><span style="color:rgba(255,255,255,.5);font-weight:500">Your profit</span><span style="font-weight:700;font-size:1.125rem;font-feature-settings:'tnum'" id="displayProfit">$0.00</span></div>
-                    </div>
-
-                    <!-- $/hr + Breakeven -->
-                    <div class="metrics-grid" id="metricsGrid" style="display:none">
-                        <div><p class="metric-label">$/Hour</p><p class="metric-value" id="displayHourly">—</p><p class="metric-hint" id="hourlyHint">Add hours above</p></div>
-                        <div><p class="metric-label">Breakeven Price</p><p class="metric-value" style="color:rgba(255,255,255,.6)" id="displayBreakeven">$0.00</p><p class="metric-hint">Min. to cover costs</p></div>
-                    </div>
-
-                    <!-- Save button -->
-                    <div style="border-top:1px solid rgba(255,255,255,.06);padding:1rem 1.5rem" id="saveSection" class="animate-fade-in">
-                        <button type="button" class="save-btn" id="saveQuoteBtn">
-                            <svg style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            Save or download this quote
-                        </button>
-                        <p style="text-align:center;color:rgba(255,255,255,.25);font-size:.6875rem;margin-top:.5rem">Save locally on this device or download a copy</p>
+                    <div class="metrics-grid" id="metricsGrid" style="display:none"><div><p class="metric-label">$/Hour</p><p class="metric-value" id="displayHourly">—</p><p class="metric-hint" id="hourlyHint">Add hours above</p></div><div><p class="metric-label">Breakeven Price</p><p class="metric-value" style="color:rgba(255,255,255,.5)" id="displayBreakeven">$0.00</p><p class="metric-hint">Min. to cover costs</p></div></div>
+                    <div style="border-top:1px solid rgba(255,255,255,.05);padding:.875rem 1.5rem" id="saveSection">
+                        <button type="button" class="save-btn" id="saveQuoteBtn"><svg style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>Save or download this quote</button>
+                        <p style="text-align:center;color:rgba(255,255,255,.18);font-size:.625rem;margin-top:.375rem">Save locally or download as PDF</p>
                     </div>
                 </div>
-
-                <!-- Recommended Pricing -->
-                <div class="glow-card" style="margin-top:1.5rem">
-                    <h3 style="display:flex;align-items:center;gap:.5rem;margin:0 0 1rem;font-size:1rem;font-weight:600;font-family:'Space Grotesk',sans-serif">
-                        <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Recommended Pricing
-                    </h3>
-                    <div style="background:rgba(239,68,68,.08);border-left:3px solid #ef4444;padding:1rem;border-radius:8px;margin-bottom:.625rem;display:flex;justify-content:space-between;align-items:center"><div><strong style="color:#ef4444">20–30%</strong><p style="font-size:.75rem;color:rgba(255,255,255,.5);margin:.125rem 0 0">Minimum viable</p></div><div style="font-size:1.25rem;font-weight:700;color:#ef4444;font-feature-settings:'tnum'" id="recommendLow">Enter costs</div></div>
-                    <div style="background:rgba(251,191,36,.08);border-left:3px solid #fbbf24;padding:1rem;border-radius:8px;margin-bottom:.625rem;display:flex;justify-content:space-between;align-items:center"><div><strong style="color:#fbbf24">31–49%</strong><p style="font-size:.75rem;color:rgba(255,255,255,.5);margin:.125rem 0 0">Moderate profit</p></div><div style="font-size:1.25rem;font-weight:700;color:#fbbf24;font-feature-settings:'tnum'" id="recommendMedium">Enter costs</div></div>
-                    <div style="background:rgba(74,222,128,.08);border-left:3px solid #4ade80;padding:1rem;border-radius:8px;display:flex;justify-content:space-between;align-items:center"><div><strong style="color:#4ade80">50–65%</strong><p style="font-size:.75rem;color:rgba(255,255,255,.5);margin:.125rem 0 0">Target zone ✓</p></div><div style="font-size:1.25rem;font-weight:700;color:#4ade80;font-feature-settings:'tnum'" id="recommendHigh">Enter costs</div></div>
-
-                    <div class="dyia-results-cta" id="resultsCta">
-                        <p style="color:#f97316;font-weight:600;margin:0 0 .375rem;font-size:.95rem">Want more powerful profit tracking?</p>
-                        <p style="color:#a3a3a3;font-size:.8rem;margin:0 0 .875rem;line-height:1.5">dyia includes an upgraded calculator + job tracking, instant quotes, customer management, and AI insights.</p>
-                        <a href="https://dyia.io" target="_blank" rel="noopener">Get dyia Pro — $10 off with code GUMROAD (expires 4/15) &rarr;</a>
-                    </div>
+                <div class="glow-card" style="margin-top:1.25rem">
+                    <h3 style="display:flex;align-items:center;gap:.5rem;margin:0 0 .875rem;font-size:.9375rem;font-weight:600;font-family:'Space Grotesk',sans-serif"><svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Recommended Pricing</h3>
+                    <div style="background:rgba(239,68,68,.06);border-left:3px solid rgba(239,68,68,.5);padding:.875rem;border-radius:8px;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center"><div><strong style="color:#ef4444;font-size:.8125rem">20–30%</strong><p style="font-size:.6875rem;color:#525252;margin:.125rem 0 0">Minimum viable</p></div><div style="font-size:1.125rem;font-weight:700;color:#ef4444;font-feature-settings:'tnum'" id="recommendLow">Enter costs</div></div>
+                    <div style="background:rgba(251,191,36,.06);border-left:3px solid rgba(251,191,36,.5);padding:.875rem;border-radius:8px;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center"><div><strong style="color:#fbbf24;font-size:.8125rem">31–49%</strong><p style="font-size:.6875rem;color:#525252;margin:.125rem 0 0">Moderate profit</p></div><div style="font-size:1.125rem;font-weight:700;color:#fbbf24;font-feature-settings:'tnum'" id="recommendMedium">Enter costs</div></div>
+                    <div style="background:rgba(74,222,128,.06);border-left:3px solid rgba(74,222,128,.5);padding:.875rem;border-radius:8px;display:flex;justify-content:space-between;align-items:center"><div><strong style="color:#4ade80;font-size:.8125rem">50–65%</strong><p style="font-size:.6875rem;color:#525252;margin:.125rem 0 0">Target zone ✓</p></div><div style="font-size:1.125rem;font-weight:700;color:#4ade80;font-feature-settings:'tnum'" id="recommendHigh">Enter costs</div></div>
+                    <div class="dyia-results-cta" id="resultsCta"><p style="color:#f97316;font-weight:600;margin:0 0 .25rem;font-size:.875rem">Want more powerful profit tracking?</p><p style="color:#737373;font-size:.75rem;margin:0 0 .75rem;line-height:1.5">dyia includes job tracking, instant quotes, customer management, and AI insights.</p><a href="https://dyia.io" target="_blank" rel="noopener">Get dyia Pro — $10 off with code GUMROAD &rarr;</a></div>
                 </div>
-
-                <!-- National Averages -->
-                <div class="glow-card" style="margin-top:1.5rem">
-                    <h4 style="color:#f97316;font-size:1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;font-family:'Space Grotesk',sans-serif">
-                        <svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                        National Averages (USA)
-                    </h4>
-                    <table class="price-table"><thead><tr><th>Load Size</th><th style="text-align:right">Range</th></tr></thead><tbody>
-                        <tr><td>Minimum Pickup</td><td>$75 - $150</td></tr>
-                        <tr><td>1/4 Load</td><td>$150 - $250</td></tr>
-                        <tr><td>1/2 Load</td><td>$250 - $450</td></tr>
-                        <tr><td>3/4 Load</td><td>$400 - $600</td></tr>
-                        <tr><td>Full Load</td><td>$550 - $850</td></tr>
-                    </tbody></table>
+                <div class="glow-card" style="margin-top:1.25rem">
+                    <h4 style="color:#f97316;font-size:.9375rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;font-family:'Space Grotesk',sans-serif"><svg class="icon" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>National Averages (USA)</h4>
+                    <table class="price-table"><thead><tr><th>Load Size</th><th style="text-align:right">Range</th></tr></thead><tbody><tr><td>Minimum Pickup</td><td>$75 - $150</td></tr><tr><td>1/4 Load</td><td>$150 - $250</td></tr><tr><td>1/2 Load</td><td>$250 - $450</td></tr><tr><td>3/4 Load</td><td>$400 - $600</td></tr><tr><td>Full Load</td><td>$550 - $850</td></tr></tbody></table>
                 </div>
             </div>
         </div>
 
-        <div class="footer">
-            <p style="margin-bottom:.5rem">Powered by <a href="https://dyia.io" target="_blank" rel="noopener">dyia</a> — The AI-powered business manager for service pros.</p>
-            <p style="font-size:.8rem">Track jobs, build quotes, manage customers, and finally know what you actually take home.</p>
-            <a href="https://dyia.io" target="_blank" rel="noopener" style="display:inline-block;margin-top:.75rem;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;padding:.5rem 1.25rem;border-radius:8px;text-decoration:none;font-size:.8rem;box-shadow:0 2px 10px rgba(249,115,22,.25)">Try dyia Free &rarr;</a>
+        <div class="footer anim-in anim-in-4">
+            <p style="margin-bottom:.375rem">Powered by <a href="https://dyia.io" target="_blank" rel="noopener">dyia</a> — The AI-powered business manager for service pros.</p>
+            <p>Track jobs, build quotes, manage customers, and finally know what you actually take home.</p>
+            <a href="https://dyia.io" target="_blank" rel="noopener" style="display:inline-block;margin-top:.75rem;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;padding:.5rem 1.25rem;border-radius:8px;text-decoration:none;font-size:.8125rem;box-shadow:0 2px 10px rgba(249,115,22,.2);transition:all .2s">Try dyia Free &rarr;</a>
         </div>
     </div>
 
-    <!-- Save Modal (hidden) -->
+    <!-- Save Modal -->
     <div class="modal-overlay" id="saveModal" style="display:none">
         <div class="modal-panel">
             <div style="display:flex;align-items:start;gap:.75rem;margin-bottom:1.25rem">
-                <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg></div>
-                <div><h3 style="color:#fafafa;font-weight:600;font-size:1rem">Save this quote</h3><p style="color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.125rem">Save locally on this device or download a copy.</p></div>
-                <button id="closeModal" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;padding:.25rem;font-size:1.25rem">&times;</button>
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(249,115,22,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg></div>
+                <div><h3 style="color:#fafafa;font-weight:600;font-size:.9375rem">Save this quote</h3><p style="color:rgba(255,255,255,.35);font-size:.6875rem;margin-top:.125rem">Save locally or download a PDF copy.</p></div>
+                <button id="closeModal" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;padding:.25rem;font-size:1.25rem;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.25)'">&times;</button>
             </div>
-            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:1rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;font-size:.875rem">
-                <div><p style="color:rgba(255,255,255,.4);font-size:.75rem">Quote total</p><p style="color:#fafafa;font-weight:600;font-size:1.125rem;font-feature-settings:'tnum'" id="modalQuoteTotal">$0.00</p></div>
-                <div style="text-align:right"><p style="color:rgba(255,255,255,.4);font-size:.75rem">Profit (<span id="modalMarginPct">0</span>%)</p><p style="font-weight:600;font-size:1.125rem;font-feature-settings:'tnum'" id="modalProfit">$0.00</p></div>
+            <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:.875rem;margin-bottom:1rem;display:flex;justify-content:space-between;font-size:.8125rem">
+                <div><p style="color:rgba(255,255,255,.35);font-size:.6875rem;margin-bottom:.125rem">Quote total</p><p style="color:#fafafa;font-weight:600;font-size:1.0625rem;font-feature-settings:'tnum'" id="modalQuoteTotal">$0.00</p></div>
+                <div style="text-align:right"><p style="color:rgba(255,255,255,.35);font-size:.6875rem;margin-bottom:.125rem">Profit (<span id="modalMarginPct">0</span>%)</p><p style="font-weight:600;font-size:1.0625rem;font-feature-settings:'tnum'" id="modalProfit">$0.00</p></div>
             </div>
-            <div style="display:grid;gap:.75rem;margin-bottom:1.25rem">
-                <div><label style="font-size:.75rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:.375rem">Customer name</label><input type="text" id="modalName" placeholder="e.g. John Smith"></div>
-                <div><label style="font-size:.75rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:.375rem">Job address (optional)</label><input type="text" id="modalAddress" placeholder="123 Main St"></div>
+            <div style="display:grid;gap:.625rem;margin-bottom:1rem">
+                <div><label style="font-size:.6875rem;font-weight:500;color:rgba(255,255,255,.4);margin-bottom:.25rem">Customer name</label><input type="text" id="modalName" placeholder="e.g. John Smith" style="padding:.625rem .75rem;font-size:.8125rem"></div>
+                <div><label style="font-size:.6875rem;font-weight:500;color:rgba(255,255,255,.4);margin-bottom:.25rem">Job address (optional)</label><input type="text" id="modalAddress" placeholder="123 Main St" style="padding:.625rem .75rem;font-size:.8125rem"></div>
             </div>
-            <button type="button" id="modalSaveLocal" style="width:100%;padding:.875rem;border-radius:12px;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;font-size:.875rem;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(249,115,22,.25);margin-bottom:.5rem">Save to local history</button>
-            <button type="button" id="modalDownload" style="width:100%;padding:.75rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem">
-                <svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Download as PDF
-            </button>
-            <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);text-align:center">
-                <p style="color:rgba(255,255,255,.25);font-size:.6875rem;margin-bottom:.5rem">Want to sync quotes across devices?</p>
-                <a href="https://dyia.io" target="_blank" rel="noopener" style="color:#f97316;font-size:.75rem;font-weight:600;text-decoration:none">Try dyia — quotes, jobs, and profit tracking in one place →</a>
-            </div>
+            <button type="button" id="modalSaveLocal" style="width:100%;padding:.75rem;border-radius:10px;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;font-size:.8125rem;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(249,115,22,.2);margin-bottom:.375rem">Save to local history</button>
+            <button type="button" id="modalDownload" class="btn-secondary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.375rem"><svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Download as PDF</button>
+            <div style="margin-top:.875rem;padding-top:.875rem;border-top:1px solid rgba(255,255,255,.04);text-align:center"><p style="color:rgba(255,255,255,.18);font-size:.625rem;margin-bottom:.25rem">Want to sync quotes across devices?</p><a href="https://dyia.io" target="_blank" rel="noopener" style="color:rgba(249,115,22,.5);font-size:.6875rem;font-weight:600;text-decoration:none">Try dyia &rarr;</a></div>
         </div>
     </div>
 
     <!-- Mobile floating bar -->
     <div class="mobile-bar" id="mobileBar">
-        <div style="display:flex;align-items:center;gap:.75rem">
-            <div style="flex:1;display:flex;align-items:center;gap:.75rem">
-                <span id="mobileMargin" style="font-size:1.5rem;font-weight:700;font-family:'Space Grotesk',sans-serif;font-feature-settings:'tnum'">0.0%</span>
-                <div style="font-size:.6875rem;color:rgba(255,255,255,.4);line-height:1.3">
-                    <p id="mobileRev">$0 rev</p>
-                    <p id="mobileProfit" style="color:rgba(249,115,22,.7)">$0 profit</p>
-                </div>
+        <div style="display:flex;align-items:center;gap:.625rem">
+            <div style="flex:1;display:flex;align-items:center;gap:.625rem">
+                <span id="mobileMargin" style="font-size:1.375rem;font-weight:700;font-family:'Space Grotesk',sans-serif;font-feature-settings:'tnum'">0.0%</span>
+                <div style="font-size:.625rem;color:rgba(255,255,255,.35);line-height:1.3"><p id="mobileRev">$0 rev</p><p id="mobileProfit" style="color:rgba(249,115,22,.6)">$0 profit</p></div>
             </div>
-            <button type="button" id="mobileSaveBtn" style="padding:.625rem 1rem;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;border:none;border-radius:12px;font-weight:600;font-size:.875rem;cursor:pointer;white-space:nowrap;box-shadow:0 2px 10px rgba(249,115,22,.25)">Save quote →</button>
+            <button type="button" id="mobileSaveBtn" style="padding:.5rem .875rem;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;border:none;border-radius:10px;font-weight:600;font-size:.75rem;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(249,115,22,.2)">Save →</button>
         </div>
     </div>
 
     <script>
-    var QUOTES_KEY = 'dyia_saved_quotes';
-    var savedQuotes = [];
-
+    var QUOTES_KEY = 'dyia_saved_quotes', savedQuotes = [];
     function fmt(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 
-    function loadQuotes() {
-        try { var raw = localStorage.getItem(QUOTES_KEY); if (raw) savedQuotes = JSON.parse(raw); } catch(e) {}
-        renderQuotes();
-    }
-
-    function saveQuoteToStorage(name, address) {
+    function loadQuotes() { try { var r = localStorage.getItem(QUOTES_KEY); if (r) savedQuotes = JSON.parse(r); } catch(e) {} renderQuotes(); }
+    function saveQuoteToStorage(name, addr) {
         var c = currentCalc();
-        var q = { id: Date.now().toString(), date: new Date().toISOString(), jobType: document.getElementById('jobType').value,
-            customerName: name || document.getElementById('customerName').value || '',
-            address: address || document.getElementById('jobAddress').value || '',
-            quotePrice: c.totalQuotePrice, totalCost: c.totalCost, profit: c.profit, margin: c.margin };
-        savedQuotes.unshift(q);
+        savedQuotes.unshift({ id: Date.now().toString(), date: new Date().toISOString(), jobType: document.getElementById('jobType').value, customerName: name || document.getElementById('customerName').value || '', address: addr || document.getElementById('jobAddress').value || '', quotePrice: c.totalQuotePrice, totalCost: c.totalCost, profit: c.profit, margin: c.margin });
         if (savedQuotes.length > 50) savedQuotes = savedQuotes.slice(0, 50);
-        localStorage.setItem(QUOTES_KEY, JSON.stringify(savedQuotes));
-        renderQuotes();
+        localStorage.setItem(QUOTES_KEY, JSON.stringify(savedQuotes)); renderQuotes();
     }
-
-    function deleteQuote(id) {
-        savedQuotes = savedQuotes.filter(function(q) { return q.id !== id });
-        localStorage.setItem(QUOTES_KEY, JSON.stringify(savedQuotes));
-        renderQuotes();
-    }
-
+    function deleteQuote(id) { savedQuotes = savedQuotes.filter(function(q) { return q.id !== id }); localStorage.setItem(QUOTES_KEY, JSON.stringify(savedQuotes)); renderQuotes(); }
     function renderQuotes() {
-        var card = document.getElementById('quoteHistoryCard');
-        var list = document.getElementById('quoteList');
+        var card = document.getElementById('quoteHistoryCard'), list = document.getElementById('quoteList');
         document.getElementById('quoteCount').textContent = savedQuotes.length;
-        if (savedQuotes.length === 0) { card.style.display = 'none'; return; }
+        if (!savedQuotes.length) { card.style.display = 'none'; return; }
         card.style.display = 'block';
-        var labels = { volume: 'Volume', multipleLoads: 'Multi-Load', specialty: 'Specialty', mixed: 'Mixed' };
-        var html = '';
+        var lb = { volume: 'Volume', multipleLoads: 'Multi-Load', specialty: 'Specialty', mixed: 'Mixed' }, h = '';
         savedQuotes.slice(0, 5).forEach(function(q) {
             var mc = q.margin >= 50 ? '#f97316' : q.margin >= 30 ? '#fbbf24' : '#ef4444';
-            html += '<div class="quote-row"><div style="flex:1;min-width:0"><p style="font-size:.875rem;font-weight:500;color:rgba(255,255,255,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (q.customerName || 'Untitled quote') + '</p><p style="font-size:.6875rem;color:rgba(255,255,255,.3)">' + (q.address ? q.address + ' · ' : '') + (labels[q.jobType] || q.jobType) + ' · ' + new Date(q.date).toLocaleDateString() + '</p></div><div style="text-align:right;flex-shrink:0"><p style="font-size:.875rem;font-weight:600;color:rgba(255,255,255,.8);font-feature-settings:\'tnum\'">$' + fmt(q.quotePrice) + '</p><p style="font-size:.6875rem;font-weight:500;color:' + mc + ';font-feature-settings:\'tnum\'">' + q.margin.toFixed(0) + '% margin</p></div><button class="quote-del" onclick="deleteQuote(\'' + q.id + '\')" title="Delete">&times;</button></div>';
-        });
-        list.innerHTML = html;
+            h += '<div class="quote-row"><div style="flex:1;min-width:0"><p style="font-size:.8125rem;font-weight:500;color:rgba(255,255,255,.65);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (q.customerName || 'Untitled quote') + '</p><p style="font-size:.625rem;color:rgba(255,255,255,.25)">' + (q.address ? q.address + ' · ' : '') + (lb[q.jobType] || q.jobType) + ' · ' + new Date(q.date).toLocaleDateString() + '</p></div><div style="text-align:right;flex-shrink:0"><p style="font-size:.8125rem;font-weight:600;color:rgba(255,255,255,.75);font-feature-settings:\'tnum\'">$' + fmt(q.quotePrice) + '</p><p style="font-size:.625rem;font-weight:500;color:' + mc + ';font-feature-settings:\'tnum\'">' + q.margin.toFixed(0) + '%</p></div><button class="quote-del" onclick="deleteQuote(\'' + q.id + '\')" title="Delete">&times;</button></div>';
+        }); list.innerHTML = h;
     }
 
     function updateJobTypeDisplay() {
         var jt = document.getElementById('jobType').value;
-        document.getElementById('volumeSection').style.display = jt === 'volume' ? 'block' : 'none';
-        document.getElementById('multipleLoadsSection').style.display = jt === 'multipleLoads' ? 'block' : 'none';
-        document.getElementById('specialtySection').style.display = jt === 'specialty' ? 'block' : 'none';
-        document.getElementById('mixedSection').style.display = jt === 'mixed' ? 'block' : 'none';
+        ['volumeSection', 'multipleLoadsSection', 'specialtySection', 'mixedSection'].forEach(function(id) { document.getElementById(id).style.display = 'none'; });
+        var target = jt === 'volume' ? 'volumeSection' : jt === 'multipleLoads' ? 'multipleLoadsSection' : jt === 'specialty' ? 'specialtySection' : 'mixedSection';
+        var el = document.getElementById(target); el.style.display = 'block'; el.style.animation = 'none'; el.offsetHeight; el.style.animation = 'fadeIn .25s ease-out';
+        calculate();
+    }
+
+    function toggleSurcharge(checkboxId, wrapId, toggleId) {
+        var cb = document.getElementById(checkboxId), wrap = document.getElementById(wrapId), tog = document.getElementById(toggleId);
+        if (cb.checked) { wrap.classList.add('open'); tog.classList.add('active'); } else { wrap.classList.remove('open'); tog.classList.remove('active'); }
         calculate();
     }
 
     function currentCalc() {
-        var jt = document.getElementById('jobType').value;
-        var bp = 0;
+        var jt = document.getElementById('jobType').value, bp = 0;
         if (jt === 'volume') bp = Number(document.getElementById('loadPrice').value) || 0;
-        else if (jt === 'multipleLoads') { var nl = Number(document.getElementById('numLoads').value) || 1; var ppl = Number(document.getElementById('pricePerLoad').value) || 0; var ld = Number(document.getElementById('loadDiscount').value) || 0; bp = nl * ppl * (1 - ld / 100); }
+        else if (jt === 'multipleLoads') { var nl = Number(document.getElementById('numLoads').value) || 1, ppl = Number(document.getElementById('pricePerLoad').value) || 0, ld = Number(document.getElementById('loadDiscount').value) || 0; bp = nl * ppl * (1 - ld / 100); }
         else if (jt === 'specialty') bp = Number(document.getElementById('specialtyPrice').value) || 0;
         else if (jt === 'mixed') bp = (Number(document.getElementById('mixedSpecialtyPrice').value) || 0) + (Number(document.getElementById('mixedLoadPrice').value) || 0);
-
-        var subtotal = bp;
-        if (document.getElementById('applyStairs').checked) subtotal += Number(document.getElementById('stairsCharge').value) || 0;
-        if (document.getElementById('applyDisassembly').checked) subtotal += Number(document.getElementById('disassemblyCharge').value) || 0;
-        if (document.getElementById('applyExtraLabor').checked) subtotal += Number(document.getElementById('extraLaborCharge').value) || 0;
-        if (document.getElementById('applyDemolition').checked) subtotal += Number(document.getElementById('demolitionCharge').value) || 0;
-
-        var tr = Number(document.getElementById('taxRate').value) || 0;
-        var taxAmt = tr > 0 ? subtotal * (tr / 100) : 0;
-        var tqp = subtotal + taxAmt;
-
-        var cl = Number(document.getElementById('costLandfill').value) || 0;
-        var cd = Number(document.getElementById('costDumpster').value) || 0;
-        var cm = Number(document.getElementById('costDemoMachine').value) || 0;
-        var ct = Number(document.getElementById('costTruckRental').value) || 0;
-        var cf = Number(document.getElementById('costFuel').value) || 0;
-        var cla = Number(document.getElementById('costLabor').value) || 0;
-        var tc = cl + cd + cm + ct + cf + cla;
-
-        var profit = subtotal - tc;
-        var margin = subtotal > 0 ? (profit / subtotal) * 100 : 0;
-        var hrs = Number(document.getElementById('estimatedHours').value) || 0;
-        var hourly = hrs > 0 ? profit / hrs : 0;
-
-        return { subtotal: subtotal, totalQuotePrice: tqp, totalCost: tc, profit: profit, margin: margin, taxAmount: taxAmt, taxRate: tr, hourlyRate: hourly, hours: hrs, breakeven: tc,
-            costs: [{ l: 'Landfill', v: cl, c: '#ef4444' }, { l: 'Dumpster', v: cd, c: '#ec4899' }, { l: 'Equipment', v: cm, c: '#a855f7' }, { l: 'Truck', v: ct, c: '#3b82f6' }, { l: 'Fuel', v: cf, c: '#06b6d4' }, { l: 'Labor', v: cla, c: '#f59e0b' }] };
+        var st = bp;
+        if (document.getElementById('applyStairs').checked) st += Number(document.getElementById('stairsCharge').value) || 0;
+        if (document.getElementById('applyDisassembly').checked) st += Number(document.getElementById('disassemblyCharge').value) || 0;
+        if (document.getElementById('applyExtraLabor').checked) st += Number(document.getElementById('extraLaborCharge').value) || 0;
+        if (document.getElementById('applyDemolition').checked) st += Number(document.getElementById('demolitionCharge').value) || 0;
+        var tr = Number(document.getElementById('taxRate').value) || 0, ta = tr > 0 ? st * (tr / 100) : 0, tqp = st + ta;
+        var cl = Number(document.getElementById('costLandfill').value) || 0, cd = Number(document.getElementById('costDumpster').value) || 0, cm = Number(document.getElementById('costDemoMachine').value) || 0, ct = Number(document.getElementById('costTruckRental').value) || 0, cf = Number(document.getElementById('costFuel').value) || 0, cla = Number(document.getElementById('costLabor').value) || 0, tc = cl + cd + cm + ct + cf + cla;
+        var p = st - tc, m = st > 0 ? (p / st) * 100 : 0, hrs = Number(document.getElementById('estimatedHours').value) || 0, hr = hrs > 0 ? p / hrs : 0;
+        return { subtotal: st, totalQuotePrice: tqp, totalCost: tc, profit: p, margin: m, taxAmount: ta, taxRate: tr, hourlyRate: hr, hours: hrs, breakeven: tc, costs: [{ l: 'Landfill', v: cl, c: '#ef4444' }, { l: 'Dumpster', v: cd, c: '#ec4899' }, { l: 'Equipment', v: cm, c: '#a855f7' }, { l: 'Truck', v: ct, c: '#3b82f6' }, { l: 'Fuel', v: cf, c: '#06b6d4' }, { l: 'Labor', v: cla, c: '#f59e0b' }] };
     }
 
     function calculate() {
-        var c = currentCalc();
-        var jt = document.getElementById('jobType').value;
-        var hasInput = c.totalQuotePrice > 0 || c.totalCost > 0;
-
-        if (jt === 'multipleLoads') {
-            var nl = Number(document.getElementById('numLoads').value) || 1;
-            var ppl = Number(document.getElementById('pricePerLoad').value) || 0;
-            var ld = Number(document.getElementById('loadDiscount').value) || 0;
-            document.getElementById('displayNumLoads').textContent = nl + ' load' + (nl > 1 ? 's' : '');
-            document.getElementById('displayPricePerLoad').textContent = '$' + ppl.toFixed(0);
-            document.getElementById('displayDiscount').textContent = ld + '%';
-            document.getElementById('displayMultiLoadTotal').textContent = '$' + fmt(nl * ppl * (1 - ld / 100));
-        }
-
+        var c = currentCalc(), jt = document.getElementById('jobType').value, hi = c.totalQuotePrice > 0 || c.totalCost > 0;
+        if (jt === 'multipleLoads') { var nl = Number(document.getElementById('numLoads').value) || 1, ppl = Number(document.getElementById('pricePerLoad').value) || 0, ld = Number(document.getElementById('loadDiscount').value) || 0; document.getElementById('displayNumLoads').textContent = nl + ' load' + (nl > 1 ? 's' : ''); document.getElementById('displayPricePerLoad').textContent = '$' + ppl.toFixed(0); document.getElementById('displayDiscount').textContent = ld + '%'; document.getElementById('displayMultiLoadTotal').textContent = '$' + fmt(nl * ppl * (1 - ld / 100)); }
         document.getElementById('displaySubtotal').textContent = '$' + fmt(c.subtotal);
         document.getElementById('displayCosts').textContent = '$' + fmt(c.totalCost);
         document.getElementById('displayProfit').textContent = '$' + fmt(c.profit);
         document.getElementById('displayProfit').style.color = c.profit >= 0 ? '#f97316' : '#ef4444';
-
-        var taxRow = document.getElementById('taxRow');
-        var cpRow = document.getElementById('customerPaysRow');
-        if (c.taxRate > 0) {
-            taxRow.style.display = 'flex'; cpRow.style.display = 'flex';
-            document.getElementById('taxLabel').textContent = 'Tax (' + c.taxRate + '%)';
-            document.getElementById('displayTax').textContent = '+$' + fmt(c.taxAmount);
-            document.getElementById('displayCustomerPays').textContent = '$' + fmt(c.totalQuotePrice);
-        } else { taxRow.style.display = 'none'; cpRow.style.display = 'none'; }
-
-        var mp = document.getElementById('currentMarginPercent');
-        var mb = document.getElementById('currentMarginBar');
-        var clamped = Math.min(Math.max(c.margin, 0), 100);
-        mp.textContent = c.margin.toFixed(1) + '%';
-        mb.style.width = clamped + '%';
-
-        if (c.margin >= 50) { mb.style.background = 'linear-gradient(90deg,#f97316,#f59e0b)'; mp.style.color = '#f97316'; }
-        else if (c.margin >= 30) { mb.style.background = 'linear-gradient(90deg,#fbbf24,#f59e0b)'; mp.style.color = '#fbbf24'; }
-        else { mb.style.background = 'linear-gradient(90deg,#ef4444,#dc2626)'; mp.style.color = '#ef4444'; }
-
+        if (c.taxRate > 0) { document.getElementById('taxRow').style.display = 'flex'; document.getElementById('customerPaysRow').style.display = 'flex'; document.getElementById('taxLabel').textContent = 'Tax (' + c.taxRate + '%)'; document.getElementById('displayTax').textContent = '+$' + fmt(c.taxAmount); document.getElementById('displayCustomerPays').textContent = '$' + fmt(c.totalQuotePrice); } else { document.getElementById('taxRow').style.display = 'none'; document.getElementById('customerPaysRow').style.display = 'none'; }
+        var mp = document.getElementById('currentMarginPercent'), mb = document.getElementById('currentMarginBar');
+        mp.textContent = c.margin.toFixed(1) + '%'; mb.style.width = Math.min(Math.max(c.margin, 0), 100) + '%';
+        if (c.margin >= 50) { mb.style.background = 'linear-gradient(90deg,#f97316,#f59e0b)'; mp.style.color = '#f97316'; } else if (c.margin >= 30) { mb.style.background = 'linear-gradient(90deg,#fbbf24,#f59e0b)'; mp.style.color = '#fbbf24'; } else { mb.style.background = 'linear-gradient(90deg,#ef4444,#dc2626)'; mp.style.color = '#ef4444'; }
         var sd = document.getElementById('marginStatus');
-        if (!hasInput) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);padding:.625rem .875rem;font-size:.875rem;color:rgba(255,255,255,.5)">→ Enter quote & costs to see margin.</div>';
-        else if (c.margin >= 50) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(249,115,22,.3);background:rgba(249,115,22,.08);padding:.625rem .875rem;font-size:.875rem;color:#fdba74">✓ Excellent — target profit zone.</div>';
-        else if (c.margin >= 30) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.08);padding:.625rem .875rem;font-size:.875rem;color:#fde68a">⚠ Moderate margin. Push to 50%+.</div>';
-        else if (c.margin > 0) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);padding:.625rem .875rem;font-size:.875rem;color:#fca5a5">⚠ Low margin — raise your price.</div>';
-        else sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(239,68,68,.5);background:rgba(239,68,68,.15);padding:.625rem .875rem;font-size:.875rem;color:#fca5a5">🚨 Losing money on this job.</div>';
-
-        // $/hr + breakeven
-        var mg = document.getElementById('metricsGrid');
-        mg.style.display = hasInput ? 'grid' : 'none';
-        var dh = document.getElementById('displayHourly');
-        var hh = document.getElementById('hourlyHint');
-        if (c.hours > 0) {
-            dh.textContent = '$' + fmt(c.hourlyRate);
-            dh.style.color = c.hourlyRate >= 75 ? '#f97316' : c.hourlyRate >= 40 ? '#fbbf24' : '#ef4444';
-            hh.textContent = c.hours + 'h on-site';
-        } else { dh.textContent = '—'; dh.style.color = 'rgba(255,255,255,.2)'; hh.textContent = 'Add hours above'; }
+        if (!hi) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:.5rem .75rem;font-size:.8125rem;color:rgba(255,255,255,.4)">→ Enter quote & costs to see margin.</div>';
+        else if (c.margin >= 50) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(249,115,22,.2);background:rgba(249,115,22,.06);padding:.5rem .75rem;font-size:.8125rem;color:#fdba74">✓ Excellent — target profit zone.</div>';
+        else if (c.margin >= 30) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(251,191,36,.2);background:rgba(251,191,36,.06);padding:.5rem .75rem;font-size:.8125rem;color:#fde68a">⚠ Moderate margin. Push to 50%+.</div>';
+        else if (c.margin > 0) sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.06);padding:.5rem .75rem;font-size:.8125rem;color:#fca5a5">⚠ Low margin — raise your price.</div>';
+        else sd.innerHTML = '<div style="border-radius:8px;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);padding:.5rem .75rem;font-size:.8125rem;color:#fca5a5">🚨 Losing money on this job.</div>';
+        document.getElementById('metricsGrid').style.display = hi ? 'grid' : 'none';
+        var dh = document.getElementById('displayHourly'), hh = document.getElementById('hourlyHint');
+        if (c.hours > 0) { dh.textContent = '$' + fmt(c.hourlyRate); dh.style.color = c.hourlyRate >= 75 ? '#f97316' : c.hourlyRate >= 40 ? '#fbbf24' : '#ef4444'; hh.textContent = c.hours + 'h on-site'; } else { dh.textContent = '—'; dh.style.color = 'rgba(255,255,255,.15)'; hh.textContent = 'Add hours above'; }
         document.getElementById('displayBreakeven').textContent = '$' + fmt(c.breakeven);
-
-        // Cost breakdown bar
-        var items = c.costs.filter(function(x) { return x.v > 0 });
-        var wrap = document.getElementById('costBarWrap');
-        if (c.totalCost > 0 && items.length > 0) {
-            wrap.style.display = 'block';
-            var bar = document.getElementById('costBar');
-            var leg = document.getElementById('costLegend');
-            bar.innerHTML = items.map(function(x) { return '<div style="background:' + x.c + ';width:' + ((x.v / c.totalCost) * 100) + '%"></div>' }).join('');
-            leg.innerHTML = items.map(function(x) { return '<span class="cost-legend-item"><span class="cost-legend-dot" style="background:' + x.c + '"></span>' + x.l + ' <span style="color:rgba(255,255,255,.6);font-weight:500">$' + fmt(x.v) + '</span></span>' }).join('');
-        } else { wrap.style.display = 'none'; }
-
-        // Recommended pricing
-        if (c.totalCost > 0) {
-            document.getElementById('recommendLow').textContent = '$' + Math.ceil(c.totalCost / .80) + ' – $' + Math.ceil(c.totalCost / .70);
-            document.getElementById('recommendMedium').textContent = '$' + Math.ceil(c.totalCost / .69) + ' – $' + Math.ceil(c.totalCost / .51);
-            document.getElementById('recommendHigh').textContent = '$' + Math.ceil(c.totalCost / .50) + ' – $' + Math.ceil(c.totalCost / .35);
-        } else { document.getElementById('recommendLow').textContent = 'Enter costs'; document.getElementById('recommendMedium').textContent = 'Enter costs'; document.getElementById('recommendHigh').textContent = 'Enter costs'; }
-
-        // Mobile bar
-        var mbar = document.getElementById('mobileBar');
-        if (hasInput) { mbar.classList.add('visible'); } else { mbar.classList.remove('visible'); }
+        var items = c.costs.filter(function(x) { return x.v > 0 }), wrap = document.getElementById('costBarWrap');
+        if (c.totalCost > 0 && items.length) { wrap.style.display = 'block'; document.getElementById('costBar').innerHTML = items.map(function(x) { return '<div style="background:' + x.c + ';width:' + ((x.v / c.totalCost) * 100) + '%"></div>' }).join(''); document.getElementById('costLegend').innerHTML = items.map(function(x) { return '<span class="cost-legend-item"><span class="cost-legend-dot" style="background:' + x.c + '"></span>' + x.l + ' <span style="color:rgba(255,255,255,.5);font-weight:500">$' + fmt(x.v) + '</span></span>' }).join(''); } else wrap.style.display = 'none';
+        if (c.totalCost > 0) { document.getElementById('recommendLow').textContent = '$' + Math.ceil(c.totalCost / .80) + ' – $' + Math.ceil(c.totalCost / .70); document.getElementById('recommendMedium').textContent = '$' + Math.ceil(c.totalCost / .69) + ' – $' + Math.ceil(c.totalCost / .51); document.getElementById('recommendHigh').textContent = '$' + Math.ceil(c.totalCost / .50) + ' – $' + Math.ceil(c.totalCost / .35); } else { document.getElementById('recommendLow').textContent = 'Enter costs'; document.getElementById('recommendMedium').textContent = 'Enter costs'; document.getElementById('recommendHigh').textContent = 'Enter costs'; }
+        var mbar = document.getElementById('mobileBar'); if (hi) mbar.classList.add('visible'); else mbar.classList.remove('visible');
         var mmc = c.margin >= 50 ? '#f97316' : c.margin >= 30 ? '#fbbf24' : '#ef4444';
-        document.getElementById('mobileMargin').textContent = c.margin.toFixed(1) + '%';
-        document.getElementById('mobileMargin').style.color = mmc;
-        document.getElementById('mobileRev').textContent = '$' + c.subtotal.toFixed(0) + (c.taxRate > 0 ? ' + ' + c.taxRate + '% tax' : ' rev') + (c.hours > 0 ? ' · $' + c.hourlyRate.toFixed(0) + '/hr' : '');
-        document.getElementById('mobileProfit').textContent = '$' + c.profit.toFixed(0) + ' profit';
-        document.getElementById('mobileProfit').style.color = c.profit >= 0 ? 'rgba(249,115,22,.7)' : 'rgba(239,68,68,.7)';
-
-        // Show scroll-to-results on mobile
-        if (window.innerWidth <= 1000) document.getElementById('scrollResultsBtn').style.display = 'block';
+        document.getElementById('mobileMargin').textContent = c.margin.toFixed(1) + '%'; document.getElementById('mobileMargin').style.color = mmc;
+        document.getElementById('mobileRev').textContent = '$' + c.subtotal.toFixed(0) + (c.taxRate > 0 ? ' +' + c.taxRate + '% tax' : ' rev') + (c.hours > 0 ? ' · $' + c.hourlyRate.toFixed(0) + '/hr' : '');
+        document.getElementById('mobileProfit').textContent = '$' + c.profit.toFixed(0) + ' profit'; document.getElementById('mobileProfit').style.color = c.profit >= 0 ? 'rgba(249,115,22,.6)' : 'rgba(239,68,68,.6)';
+        if (window.innerWidth <= 1080 && hi) document.getElementById('scrollResultsBtn').style.display = 'block'; else document.getElementById('scrollResultsBtn').style.display = 'none';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Promo expiry
-        if (new Date() >= new Date('2026-04-16T00:00:00')) {
-            var b = document.getElementById('promoBanner'); if (b) b.style.display = 'none';
-            var r = document.getElementById('resultsCta'); if (r) r.style.display = 'none';
-        }
-
+        if (new Date() >= new Date('2026-04-16T00:00:00')) { var b = document.getElementById('promoBanner'); if (b) b.style.display = 'none'; var r = document.getElementById('resultsCta'); if (r) r.style.display = 'none'; }
         loadQuotes();
-
-        var inputs = document.querySelectorAll('input[type="number"],input[type="checkbox"],select');
-        inputs.forEach(function(el) { el.addEventListener('input', calculate); el.addEventListener('change', calculate); if (el.type === 'checkbox') el.addEventListener('click', calculate); });
+        document.querySelectorAll('input[type="number"],input[type="checkbox"],select').forEach(function(el) { el.addEventListener('input', calculate); el.addEventListener('change', calculate); });
         document.getElementById('jobType').addEventListener('change', updateJobTypeDisplay);
 
+        ['applyStairs', 'applyDisassembly', 'applyExtraLabor', 'applyDemolition'].forEach(function(id) {
+            var map = { applyStairs: ['stairsAmountWrap', 'stairsToggle'], applyDisassembly: ['disassemblyAmountWrap', 'disassemblyToggle'], applyExtraLabor: ['extraLaborAmountWrap', 'extraLaborToggle'], applyDemolition: ['demolitionAmountWrap', 'demolitionToggle'] };
+            document.getElementById(id).addEventListener('change', function() { toggleSurcharge(id, map[id][0], map[id][1]); });
+        });
+
         document.getElementById('clearBtn').addEventListener('click', function() {
-            document.getElementById('jobType').value = 'volume'; document.getElementById('customerName').value = ''; document.getElementById('jobAddress').value = '';
-            document.getElementById('estimatedHours').value = '0'; document.getElementById('analyzeLoadSize').value = 'half'; document.getElementById('loadPrice').value = '0';
-            document.getElementById('numLoads').value = '1'; document.getElementById('pricePerLoad').value = '0'; document.getElementById('loadDiscount').value = '0';
-            document.getElementById('specialtyType').value = 'hottub'; document.getElementById('specialtyPrice').value = '0';
-            document.getElementById('mixedSpecialtyType').value = 'hottub'; document.getElementById('mixedSpecialtyPrice').value = '0'; document.getElementById('mixedLoadSize').value = 'quarter'; document.getElementById('mixedLoadPrice').value = '0';
-            document.getElementById('applyStairs').checked = false; document.getElementById('stairsCharge').value = '0';
-            document.getElementById('applyDisassembly').checked = false; document.getElementById('disassemblyCharge').value = '0';
-            document.getElementById('applyExtraLabor').checked = false; document.getElementById('extraLaborCharge').value = '0';
-            document.getElementById('applyDemolition').checked = false; document.getElementById('demolitionCharge').value = '0';
-            document.getElementById('costLandfill').value = '0'; document.getElementById('costDumpster').value = '0'; document.getElementById('costDemoMachine').value = '0';
-            document.getElementById('costTruckRental').value = '0'; document.getElementById('costFuel').value = '0'; document.getElementById('costLabor').value = '0';
-            document.getElementById('taxRate').value = '0'; document.getElementById('jobNotes').value = '';
+            ['customerName', 'jobAddress', 'jobNotes'].forEach(function(id) { document.getElementById(id).value = ''; });
+            ['estimatedHours', 'loadPrice', 'pricePerLoad', 'loadDiscount', 'specialtyPrice', 'mixedSpecialtyPrice', 'mixedLoadPrice', 'stairsCharge', 'disassemblyCharge', 'extraLaborCharge', 'demolitionCharge', 'costLandfill', 'costDumpster', 'costDemoMachine', 'costTruckRental', 'costFuel', 'costLabor', 'taxRate'].forEach(function(id) { document.getElementById(id).value = ''; });
+            document.getElementById('jobType').value = 'volume'; document.getElementById('numLoads').value = '1'; document.getElementById('analyzeLoadSize').value = 'half'; document.getElementById('mixedLoadSize').value = 'quarter';
+            ['applyStairs', 'applyDisassembly', 'applyExtraLabor', 'applyDemolition'].forEach(function(id) { document.getElementById(id).checked = false; });
+            document.querySelectorAll('.surcharge-amount').forEach(function(el) { el.classList.remove('open'); });
+            document.querySelectorAll('.checkbox-container').forEach(function(el) { el.classList.remove('active'); });
             updateJobTypeDisplay();
+            this.textContent = '✓ Cleared'; var self = this; setTimeout(function() { self.textContent = 'Clear all'; }, 1000);
         });
 
         document.getElementById('scrollResultsBtn').addEventListener('click', function() { document.getElementById('resultsCol').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-
-        // Save modal
-        document.getElementById('saveQuoteBtn').addEventListener('click', function() { openSaveModal(); });
-        document.getElementById('mobileSaveBtn').addEventListener('click', function() { openSaveModal(); });
-        document.getElementById('closeModal').addEventListener('click', function() { document.getElementById('saveModal').style.display = 'none'; });
-        document.getElementById('saveModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
+        document.getElementById('saveQuoteBtn').addEventListener('click', openSaveModal);
+        document.getElementById('mobileSaveBtn').addEventListener('click', openSaveModal);
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('saveModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
         document.getElementById('modalSaveLocal').addEventListener('click', function() {
             saveQuoteToStorage(document.getElementById('modalName').value, document.getElementById('modalAddress').value);
             this.textContent = '✓ Saved!'; this.style.background = '#ea580c';
-            setTimeout(function() { document.getElementById('saveModal').style.display = 'none'; document.getElementById('modalSaveLocal').textContent = 'Save to local history'; document.getElementById('modalSaveLocal').style.background = ''; }, 1200);
+            setTimeout(function() { closeModal(); document.getElementById('modalSaveLocal').textContent = 'Save to local history'; document.getElementById('modalSaveLocal').style.background = ''; }, 1000);
         });
         document.getElementById('modalDownload').addEventListener('click', function() {
             downloadQuoteSummary();
             this.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Downloaded!';
-            var self = this;
-            setTimeout(function() { self.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Download as PDF'; }, 1500);
+            var self = this; setTimeout(function() { self.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Download as PDF'; }, 1200);
         });
-
-        updateJobTypeDisplay();
-        calculate();
+        updateJobTypeDisplay(); calculate();
     });
 
+    function closeModal() { document.getElementById('saveModal').style.display = 'none'; }
+    function openSaveModal() { var c = currentCalc(); document.getElementById('modalQuoteTotal').textContent = '$' + fmt(c.totalQuotePrice); document.getElementById('modalMarginPct').textContent = c.margin.toFixed(0); document.getElementById('modalProfit').textContent = '$' + fmt(c.profit); document.getElementById('modalProfit').style.color = c.profit >= 0 ? '#f97316' : '#ef4444'; document.getElementById('modalName').value = document.getElementById('customerName').value; document.getElementById('modalAddress').value = document.getElementById('jobAddress').value; document.getElementById('saveModal').style.display = 'flex'; }
+
     function downloadQuoteSummary() {
-        var c = currentCalc();
-        var name = document.getElementById('modalName').value || document.getElementById('customerName').value || 'Customer';
-        var addr = document.getElementById('modalAddress').value || document.getElementById('jobAddress').value || '';
-        var jt = document.getElementById('jobType').value;
-        var labels = { volume: 'Volume-Based', multipleLoads: 'Multiple Loads', specialty: 'Specialty Item', mixed: 'Mixed Job' };
-        var notes = document.getElementById('jobNotes').value;
-        var date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-        var doc = new jspdf.jsPDF({ unit: 'mm', format: 'letter' });
-        var W = doc.internal.pageSize.getWidth();
-        var mg = 20;
-        var cw = W - mg * 2;
-        var y = 0;
-
-        // Brand header bar
-        doc.setFillColor(249, 115, 22);
-        doc.rect(0, 0, W, 38, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(22);
-        doc.setTextColor(255, 255, 255);
-        doc.text('Quote Summary', mg, 18);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(date, mg, 28);
-        doc.setFontSize(9);
-        doc.text('Powered by dyia', W - mg, 28, { align: 'right' });
-
-        y = 52;
-
-        // Customer info section
-        doc.setFillColor(248, 248, 248);
-        doc.roundedRect(mg, y - 6, cw, addr ? 28 : 20, 3, 3, 'F');
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text('CUSTOMER', mg + 5, y);
-        doc.setFontSize(13);
-        doc.setTextColor(30, 30, 30);
-        doc.setFont('helvetica', 'bold');
-        doc.text(name, mg + 5, y + 8);
-        if (addr) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.text(addr, mg + 5, y + 16); }
-
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text('JOB TYPE', W - mg - 50, y);
-        doc.setFontSize(11);
-        doc.setTextColor(30, 30, 30);
-        doc.setFont('helvetica', 'bold');
-        doc.text(labels[jt] || jt, W - mg - 50, y + 8);
-        if (c.hours > 0) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(c.hours + ' hours on-site', W - mg - 50, y + 16); }
-
+        var c = currentCalc(), name = document.getElementById('modalName').value || document.getElementById('customerName').value || 'Customer', addr = document.getElementById('modalAddress').value || document.getElementById('jobAddress').value || '', jt = document.getElementById('jobType').value, labels = { volume: 'Volume-Based', multipleLoads: 'Multiple Loads', specialty: 'Specialty Item', mixed: 'Mixed Job' }, notes = document.getElementById('jobNotes').value, date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        var doc = new jspdf.jsPDF({ unit: 'mm', format: 'letter' }), W = doc.internal.pageSize.getWidth(), mg = 20, cw = W - mg * 2, y = 0;
+        doc.setFillColor(249, 115, 22); doc.rect(0, 0, W, 38, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(255, 255, 255); doc.text('Quote Summary', mg, 18); doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(date, mg, 28); doc.setFontSize(9); doc.text('Powered by dyia', W - mg, 28, { align: 'right' }); y = 52;
+        doc.setFillColor(248, 248, 248); doc.roundedRect(mg, y - 6, cw, addr ? 28 : 20, 3, 3, 'F'); doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.text('CUSTOMER', mg + 5, y); doc.setFontSize(13); doc.setTextColor(30, 30, 30); doc.setFont('helvetica', 'bold'); doc.text(name, mg + 5, y + 8); if (addr) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.text(addr, mg + 5, y + 16); }
+        doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.text('JOB TYPE', W - mg - 50, y); doc.setFontSize(11); doc.setTextColor(30, 30, 30); doc.setFont('helvetica', 'bold'); doc.text(labels[jt] || jt, W - mg - 50, y + 8); if (c.hours > 0) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(c.hours + ' hours on-site', W - mg - 50, y + 16); }
         y += addr ? 36 : 28;
-
-        // Big margin display
-        var marginColor = c.margin >= 50 ? [249, 115, 22] : c.margin >= 30 ? [234, 179, 8] : [220, 38, 38];
-        doc.setFillColor(marginColor[0], marginColor[1], marginColor[2]);
-        doc.roundedRect(mg, y, cw, 32, 3, 3, 'F');
-        doc.setFontSize(28);
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
-        doc.text(c.margin.toFixed(1) + '%', mg + cw / 2, y + 16, { align: 'center' });
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text('GROSS PROFIT MARGIN', mg + cw / 2, y + 25, { align: 'center' });
-
-        y += 42;
-
-        // Pricing breakdown
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.setFont('helvetica', 'bold');
-        doc.text('PRICING', mg, y);
-        y += 6;
-        doc.setDrawColor(230, 230, 230);
-        doc.line(mg, y, W - mg, y);
-        y += 7;
-
-        function row(label, value, bold, color) {
-            doc.setFont('helvetica', bold ? 'bold' : 'normal');
-            doc.setFontSize(10);
-            doc.setTextColor(color ? color[0] : 80, color ? color[1] : 80, color ? color[2] : 80);
-            doc.text(label, mg + 2, y);
-            doc.text(value, W - mg - 2, y, { align: 'right' });
-            y += 7;
-        }
-
-        row('Subtotal', '$' + fmt(c.subtotal), false);
-        if (c.taxRate > 0) {
-            row('Tax (' + c.taxRate + '%)', '+$' + fmt(c.taxAmount), false, [100, 100, 100]);
-            row('Customer Pays', '$' + fmt(c.totalQuotePrice), true, [30, 30, 30]);
-        }
-        y += 3;
-
-        // Costs breakdown
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.setFont('helvetica', 'bold');
-        doc.text('COSTS', mg, y);
-        y += 6;
-        doc.line(mg, y, W - mg, y);
-        y += 7;
-
-        var costColors = { Landfill: [239, 68, 68], Dumpster: [236, 72, 153], Equipment: [168, 85, 247], Truck: [59, 130, 246], Fuel: [6, 182, 212], Labor: [245, 158, 11] };
-        c.costs.forEach(function(x) {
-            if (x.v > 0) {
-                var cc = costColors[x.l] || [100, 100, 100];
-                doc.setFillColor(cc[0], cc[1], cc[2]);
-                doc.circle(mg + 4, y - 1.5, 1.5, 'F');
-                row(x.l, '$' + fmt(x.v), false);
-            }
-        });
-        doc.setDrawColor(200, 200, 200);
-        doc.line(mg + 2, y - 2, W - mg - 2, y - 2);
-        y += 2;
-        row('Total Costs', '$' + fmt(c.totalCost), true, [220, 38, 38]);
-        y += 5;
-
-        // Profit analysis
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.setFont('helvetica', 'bold');
-        doc.text('PROFIT ANALYSIS', mg, y);
-        y += 6;
-        doc.setDrawColor(230, 230, 230);
-        doc.line(mg, y, W - mg, y);
-        y += 7;
-
-        doc.setFillColor(marginColor[0], marginColor[1], marginColor[2]);
-        doc.roundedRect(mg, y - 5, cw, 14, 2, 2, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.setTextColor(255, 255, 255);
-        doc.text('Your Profit', mg + 5, y + 3);
-        doc.text('$' + fmt(c.profit), W - mg - 5, y + 3, { align: 'right' });
-        y += 16;
-
-        row('Gross Margin', c.margin.toFixed(1) + '%', true, marginColor);
-        if (c.hours > 0) {
-            var hrColor = c.hourlyRate >= 75 ? [249, 115, 22] : c.hourlyRate >= 40 ? [234, 179, 8] : [220, 38, 38];
-            row('$/Hour', '$' + fmt(c.hourlyRate), true, hrColor);
-        }
-        row('Breakeven Price', '$' + fmt(c.breakeven), false, [100, 100, 100]);
-
-        // Notes
-        if (notes) {
-            y += 5;
-            doc.setFontSize(8);
-            doc.setTextColor(150, 150, 150);
-            doc.setFont('helvetica', 'bold');
-            doc.text('NOTES', mg, y);
-            y += 6;
-            doc.line(mg, y, W - mg, y);
-            y += 6;
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(9);
-            doc.setTextColor(80, 80, 80);
-            var splitNotes = doc.splitTextToSize(notes, cw - 4);
-            doc.text(splitNotes, mg + 2, y);
-        }
-
-        // Footer
-        var fY = doc.internal.pageSize.getHeight() - 12;
-        doc.setDrawColor(230, 230, 230);
-        doc.line(mg, fY - 6, W - mg, fY - 6);
-        doc.setFontSize(7);
-        doc.setTextColor(180, 180, 180);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Generated by Junk Removal Profit Calculator — Powered by dyia (dyia.io)', mg, fY);
-        doc.text(date, W - mg, fY, { align: 'right' });
-
+        var mc = c.margin >= 50 ? [249, 115, 22] : c.margin >= 30 ? [234, 179, 8] : [220, 38, 38]; doc.setFillColor(mc[0], mc[1], mc[2]); doc.roundedRect(mg, y, cw, 32, 3, 3, 'F'); doc.setFontSize(28); doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.text(c.margin.toFixed(1) + '%', mg + cw / 2, y + 16, { align: 'center' }); doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.text('GROSS PROFIT MARGIN', mg + cw / 2, y + 25, { align: 'center' }); y += 42;
+        function row(l, v, b, col) { doc.setFont('helvetica', b ? 'bold' : 'normal'); doc.setFontSize(10); doc.setTextColor(col ? col[0] : 80, col ? col[1] : 80, col ? col[2] : 80); doc.text(l, mg + 2, y); doc.text(v, W - mg - 2, y, { align: 'right' }); y += 7; }
+        doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.setFont('helvetica', 'bold'); doc.text('PRICING', mg, y); y += 6; doc.setDrawColor(230, 230, 230); doc.line(mg, y, W - mg, y); y += 7;
+        row('Subtotal', '$' + fmt(c.subtotal), false); if (c.taxRate > 0) { row('Tax (' + c.taxRate + '%)', '+$' + fmt(c.taxAmount), false, [100, 100, 100]); row('Customer Pays', '$' + fmt(c.totalQuotePrice), true, [30, 30, 30]); } y += 3;
+        doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.setFont('helvetica', 'bold'); doc.text('COSTS', mg, y); y += 6; doc.line(mg, y, W - mg, y); y += 7;
+        var cc = { Landfill: [239, 68, 68], Dumpster: [236, 72, 153], Equipment: [168, 85, 247], Truck: [59, 130, 246], Fuel: [6, 182, 212], Labor: [245, 158, 11] };
+        c.costs.forEach(function(x) { if (x.v > 0) { var k = cc[x.l] || [100, 100, 100]; doc.setFillColor(k[0], k[1], k[2]); doc.circle(mg + 4, y - 1.5, 1.5, 'F'); row(x.l, '$' + fmt(x.v), false); } });
+        doc.setDrawColor(200, 200, 200); doc.line(mg + 2, y - 2, W - mg - 2, y - 2); y += 2; row('Total Costs', '$' + fmt(c.totalCost), true, [220, 38, 38]); y += 5;
+        doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.setFont('helvetica', 'bold'); doc.text('PROFIT ANALYSIS', mg, y); y += 6; doc.setDrawColor(230, 230, 230); doc.line(mg, y, W - mg, y); y += 7;
+        doc.setFillColor(mc[0], mc[1], mc[2]); doc.roundedRect(mg, y - 5, cw, 14, 2, 2, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 255, 255); doc.text('Your Profit', mg + 5, y + 3); doc.text('$' + fmt(c.profit), W - mg - 5, y + 3, { align: 'right' }); y += 16;
+        row('Gross Margin', c.margin.toFixed(1) + '%', true, mc); if (c.hours > 0) { var hc = c.hourlyRate >= 75 ? [249, 115, 22] : c.hourlyRate >= 40 ? [234, 179, 8] : [220, 38, 38]; row('$/Hour', '$' + fmt(c.hourlyRate), true, hc); } row('Breakeven Price', '$' + fmt(c.breakeven), false, [100, 100, 100]);
+        if (notes) { y += 5; doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.setFont('helvetica', 'bold'); doc.text('NOTES', mg, y); y += 6; doc.line(mg, y, W - mg, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text(doc.splitTextToSize(notes, cw - 4), mg + 2, y); }
+        var fY = doc.internal.pageSize.getHeight() - 12; doc.setDrawColor(230, 230, 230); doc.line(mg, fY - 6, W - mg, fY - 6); doc.setFontSize(7); doc.setTextColor(180, 180, 180); doc.setFont('helvetica', 'normal'); doc.text('Generated by Junk Removal Profit Calculator — Powered by dyia (dyia.io)', mg, fY); doc.text(date, W - mg, fY, { align: 'right' });
         doc.save('Quote_' + name.replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
     }
-
-    function openSaveModal() {
-        var c = currentCalc();
-        document.getElementById('modalQuoteTotal').textContent = '$' + fmt(c.totalQuotePrice);
-        document.getElementById('modalMarginPct').textContent = c.margin.toFixed(0);
-        document.getElementById('modalProfit').textContent = '$' + fmt(c.profit);
-        document.getElementById('modalProfit').style.color = c.profit >= 0 ? '#f97316' : '#ef4444';
-        document.getElementById('modalName').value = document.getElementById('customerName').value;
-        document.getElementById('modalAddress').value = document.getElementById('jobAddress').value;
-        document.getElementById('saveModal').style.display = 'flex';
-    }
     </script>
-
     <script>
     (function() {
-        var LICENSE_STORAGE_KEY = 'junkRemovalCalcLicense';
-        var modalHTML = '<div id="licenseModal" style="position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:10000;display:flex;align-items:center;justify-content:center;font-family:\'DM Sans\',-apple-system,sans-serif"><div style="background:linear-gradient(135deg,#0a0a0a,#171717);padding:2.5rem;border-radius:16px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(249,115,22,.2)"><div style="text-align:center;margin-bottom:2rem"><div style="background:linear-gradient(135deg,#f97316,#f59e0b);width:70px;height:70px;border-radius:50%;margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(249,115,22,.35)"><svg style="width:36px;height:36px" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><h2 style="color:#fafafa;font-family:\'Space Grotesk\',sans-serif;font-size:1.65rem;font-weight:700;margin-bottom:.5rem">Activate Your Calculator</h2><p style="color:#a3a3a3;font-size:.9rem;line-height:1.5">Enter the license key from your Gumroad purchase email</p></div><div style="margin-bottom:1.5rem"><label style="color:#e5e5e5;font-size:.875rem;font-weight:600;display:block;margin-bottom:.5rem">License Key:</label><input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:.875rem;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:10px;color:#fafafa;font-size:.95rem;font-family:monospace;text-align:center;letter-spacing:1.5px;box-sizing:border-box"/></div><div id="licenseError" style="display:none;background:rgba(239,68,68,.1);border:1px solid #ef4444;border-radius:8px;padding:.875rem;margin-bottom:1rem"><p style="color:#ef4444;font-size:.875rem;margin:0;text-align:center"></p></div><div id="licenseSuccess" style="display:none;background:rgba(249,115,22,.1);border:1px solid #f97316;border-radius:8px;padding:.875rem;margin-bottom:1rem"><p style="color:#f97316;font-size:.875rem;margin:0;text-align:center"></p></div><button id="validateLicenseBtn" style="width:100%;padding:1rem;background:linear-gradient(135deg,#f97316,#f59e0b);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:1rem;cursor:pointer;transition:all .3s;box-shadow:0 4px 14px rgba(249,115,22,.35);font-family:\'DM Sans\',sans-serif">Activate Calculator</button><div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.08);text-align:center"><p style="color:#737373;font-size:.75rem;margin:0;line-height:1.6">Can\'t find your license key?<br/>Check your purchase confirmation email from Gumroad</p></div></div></div>';
-
-        function checkExistingLicense() {
-            var stored = localStorage.getItem(LICENSE_STORAGE_KEY);
-            if (stored) { try { JSON.parse(stored); var m = document.getElementById('licenseModal'); if (m) m.remove(); return true; } catch(e) { localStorage.removeItem(LICENSE_STORAGE_KEY); } }
-            return false;
-        }
-
-        async function validateLicense(licenseKey) {
-            var btn = document.getElementById('validateLicenseBtn'), errDiv = document.getElementById('licenseError'), sucDiv = document.getElementById('licenseSuccess'), input = document.getElementById('licenseKeyInput');
-            btn.textContent = 'Validating...'; btn.disabled = true; btn.style.opacity = '.7'; errDiv.style.display = 'none'; sucDiv.style.display = 'none';
-            try {
-                var response = await fetch('https://api.gumroad.com/v2/licenses/verify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ product_id: 'j0OKIs1pwGjmo-wvOITLRA==', license_key: licenseKey.trim() }) });
-                var data = await response.json();
-                if (data.success) {
-                    localStorage.setItem(LICENSE_STORAGE_KEY, JSON.stringify({ key: licenseKey.trim(), validated: new Date().toISOString() }));
-                    sucDiv.querySelector('p').textContent = '✓ License activated successfully!'; sucDiv.style.display = 'block';
-                    setTimeout(function() { var m = document.getElementById('licenseModal'); if (m) m.remove(); }, 1500);
-                } else { errDiv.querySelector('p').textContent = '✗ Invalid license key. Please check your email and try again.'; errDiv.style.display = 'block'; btn.textContent = 'Activate Calculator'; btn.disabled = false; btn.style.opacity = '1'; input.value = ''; input.focus(); }
-            } catch(error) { errDiv.querySelector('p').textContent = '✗ Connection error. Please check your internet and try again.'; errDiv.style.display = 'block'; btn.textContent = 'Activate Calculator'; btn.disabled = false; btn.style.opacity = '1'; }
-        }
-
-        window.addEventListener('DOMContentLoaded', function() {
-            if (!checkExistingLicense()) {
-                document.body.insertAdjacentHTML('afterbegin', modalHTML);
-                var btn = document.getElementById('validateLicenseBtn'), input = document.getElementById('licenseKeyInput');
-                btn.addEventListener('click', function() { var k = input.value.trim(); if (k) validateLicense(k); else { var e = document.getElementById('licenseError'); e.querySelector('p').textContent = 'Please enter a license key'; e.style.display = 'block'; } });
-                input.addEventListener('keypress', function(e) { if (e.key === 'Enter') btn.click(); });
-                setTimeout(function() { input.focus(); }, 100);
-            }
-        });
+        var LSK = 'junkRemovalCalcLicense';
+        var mh = '<div id="licenseModal" style="position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:10000;display:flex;align-items:center;justify-content:center;font-family:\'DM Sans\',-apple-system,sans-serif"><div style="background:linear-gradient(135deg,#0a0a0a,#171717);padding:2.5rem;border-radius:18px;max-width:440px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.6);border:1px solid rgba(249,115,22,.15)"><div style="text-align:center;margin-bottom:2rem"><div style="background:linear-gradient(135deg,#f97316,#f59e0b);width:64px;height:64px;border-radius:50%;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(249,115,22,.3)"><svg style="width:32px;height:32px" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><h2 style="color:#fafafa;font-family:\'Space Grotesk\',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:.375rem">Activate Your Calculator</h2><p style="color:#737373;font-size:.8125rem;line-height:1.5">Enter the license key from your Gumroad purchase email</p></div><div style="margin-bottom:1.25rem"><label style="color:#a3a3a3;font-size:.8125rem;font-weight:600;display:block;margin-bottom:.375rem">License Key</label><input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:.75rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fafafa;font-size:.875rem;font-family:monospace;text-align:center;letter-spacing:1.5px;box-sizing:border-box"/></div><div id="licenseError" style="display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.75rem;margin-bottom:.875rem"><p style="color:#ef4444;font-size:.8125rem;margin:0;text-align:center"></p></div><div id="licenseSuccess" style="display:none;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);border-radius:8px;padding:.75rem;margin-bottom:.875rem"><p style="color:#f97316;font-size:.8125rem;margin:0;text-align:center"></p></div><button id="validateLicenseBtn" style="width:100%;padding:.875rem;background:linear-gradient(135deg,#f97316,#f59e0b);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:.9375rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(249,115,22,.3);font-family:\'DM Sans\',sans-serif">Activate Calculator</button><div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.06);text-align:center"><p style="color:#525252;font-size:.6875rem;margin:0;line-height:1.6">Can\'t find your key? Check your Gumroad confirmation email.</p></div></div></div>';
+        function chk() { var s = localStorage.getItem(LSK); if (s) { try { JSON.parse(s); var m = document.getElementById('licenseModal'); if (m) m.remove(); return true; } catch(e) { localStorage.removeItem(LSK); } } return false; }
+        async function val(k) { var b = document.getElementById('validateLicenseBtn'), e = document.getElementById('licenseError'), s = document.getElementById('licenseSuccess'), i = document.getElementById('licenseKeyInput'); b.textContent = 'Validating...'; b.disabled = true; b.style.opacity = '.6'; e.style.display = 'none'; s.style.display = 'none'; try { var r = await fetch('https://api.gumroad.com/v2/licenses/verify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ product_id: 'j0OKIs1pwGjmo-wvOITLRA==', license_key: k.trim() }) }); var d = await r.json(); if (d.success) { localStorage.setItem(LSK, JSON.stringify({ key: k.trim(), validated: new Date().toISOString() })); s.querySelector('p').textContent = '✓ License activated!'; s.style.display = 'block'; setTimeout(function() { var m = document.getElementById('licenseModal'); if (m) m.remove(); }, 1200); } else { e.querySelector('p').textContent = 'Invalid license key. Check your email and try again.'; e.style.display = 'block'; b.textContent = 'Activate Calculator'; b.disabled = false; b.style.opacity = '1'; i.value = ''; i.focus(); } } catch(x) { e.querySelector('p').textContent = 'Connection error. Check internet and try again.'; e.style.display = 'block'; b.textContent = 'Activate Calculator'; b.disabled = false; b.style.opacity = '1'; } }
+        window.addEventListener('DOMContentLoaded', function() { if (!chk()) { document.body.insertAdjacentHTML('afterbegin', mh); var b = document.getElementById('validateLicenseBtn'), i = document.getElementById('licenseKeyInput'); b.addEventListener('click', function() { var k = i.value.trim(); if (k) val(k); else { var e = document.getElementById('licenseError'); e.querySelector('p').textContent = 'Please enter a license key'; e.style.display = 'block'; } }); i.addEventListener('keypress', function(e) { if (e.key === 'Enter') b.click(); }); setTimeout(function() { i.focus(); }, 150); } });
     })();
     </script>
 </body>

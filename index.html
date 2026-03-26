@@ -322,9 +322,9 @@
                     <div style="border-top:1px solid rgba(255,255,255,.06);padding:1rem 1.5rem" id="saveSection" class="animate-fade-in">
                         <button type="button" class="save-btn" id="saveQuoteBtn">
                             <svg style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            Save this quote
+                            Save or download this quote
                         </button>
-                        <p style="text-align:center;color:rgba(255,255,255,.25);font-size:.6875rem;margin-top:.5rem">Save locally or to your dyia pipeline</p>
+                        <p style="text-align:center;color:rgba(255,255,255,.25);font-size:.6875rem;margin-top:.5rem">Save locally on this device or download a copy</p>
                     </div>
                 </div>
 
@@ -373,9 +373,9 @@
     <div class="modal-overlay" id="saveModal" style="display:none">
         <div class="modal-panel">
             <div style="display:flex;align-items:start;gap:.75rem;margin-bottom:1.25rem">
-                <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#f97316,#f59e0b);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="color:#fff;font-weight:900;font-size:1.125rem">d</span></div>
-                <div><h3 style="color:#fafafa;font-weight:600;font-size:1rem">Save this quote</h3><p style="color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.125rem">Save locally or send it to your dyia pipeline.</p></div>
-                <button id="closeModal" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;padding:.25rem">&times;</button>
+                <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg></div>
+                <div><h3 style="color:#fafafa;font-weight:600;font-size:1rem">Save this quote</h3><p style="color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.125rem">Save locally on this device or download a copy.</p></div>
+                <button id="closeModal" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;padding:.25rem;font-size:1.25rem">&times;</button>
             </div>
             <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:1rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;font-size:.875rem">
                 <div><p style="color:rgba(255,255,255,.4);font-size:.75rem">Quote total</p><p style="color:#fafafa;font-weight:600;font-size:1.125rem;font-feature-settings:'tnum'" id="modalQuoteTotal">$0.00</p></div>
@@ -385,9 +385,15 @@
                 <div><label style="font-size:.75rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:.375rem">Customer name</label><input type="text" id="modalName" placeholder="e.g. John Smith"></div>
                 <div><label style="font-size:.75rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:.375rem">Job address (optional)</label><input type="text" id="modalAddress" placeholder="123 Main St"></div>
             </div>
-            <button type="button" id="modalSaveLocal" style="width:100%;padding:.75rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s;margin-bottom:.625rem">Save to local history</button>
-            <a href="https://dyia.co" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.875rem;border-radius:12px;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:600;font-size:.875rem;text-decoration:none;box-shadow:0 4px 14px rgba(249,115,22,.25)">Save to dyia & create account →</a>
-            <p style="text-align:center;color:rgba(255,255,255,.2);font-size:.6875rem;margin-top:.5rem">Free 14-day trial · Quotes sync to your dashboard</p>
+            <button type="button" id="modalSaveLocal" style="width:100%;padding:.875rem;border-radius:12px;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;font-size:.875rem;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(249,115,22,.25);margin-bottom:.5rem">Save to local history</button>
+            <button type="button" id="modalDownload" style="width:100%;padding:.75rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem">
+                <svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Download quote summary
+            </button>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);text-align:center">
+                <p style="color:rgba(255,255,255,.25);font-size:.6875rem;margin-bottom:.5rem">Want to sync quotes across devices?</p>
+                <a href="https://dyia.co" target="_blank" rel="noopener" style="color:#f97316;font-size:.75rem;font-weight:600;text-decoration:none">Try dyia — quotes, jobs, and profit tracking in one place →</a>
+            </div>
         </div>
     </div>
 
@@ -621,13 +627,81 @@
         document.getElementById('saveModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
         document.getElementById('modalSaveLocal').addEventListener('click', function() {
             saveQuoteToStorage(document.getElementById('modalName').value, document.getElementById('modalAddress').value);
-            this.textContent = '✓ Saved to local history'; this.style.color = '#f97316'; this.style.borderColor = 'rgba(249,115,22,.3)';
-            setTimeout(function() { document.getElementById('saveModal').style.display = 'none'; document.getElementById('modalSaveLocal').textContent = 'Save to local history'; document.getElementById('modalSaveLocal').style.color = ''; document.getElementById('modalSaveLocal').style.borderColor = ''; }, 1200);
+            this.textContent = '✓ Saved!'; this.style.background = '#ea580c';
+            setTimeout(function() { document.getElementById('saveModal').style.display = 'none'; document.getElementById('modalSaveLocal').textContent = 'Save to local history'; document.getElementById('modalSaveLocal').style.background = ''; }, 1200);
+        });
+        document.getElementById('modalDownload').addEventListener('click', function() {
+            downloadQuoteSummary();
+            this.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Downloaded!';
+            var self = this;
+            setTimeout(function() { self.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Download quote summary'; }, 1500);
         });
 
         updateJobTypeDisplay();
         calculate();
     });
+
+    function downloadQuoteSummary() {
+        var c = currentCalc();
+        var name = document.getElementById('modalName').value || document.getElementById('customerName').value || 'Customer';
+        var addr = document.getElementById('modalAddress').value || document.getElementById('jobAddress').value || '';
+        var jt = document.getElementById('jobType').value;
+        var labels = { volume: 'Volume-Based', multipleLoads: 'Multiple Loads', specialty: 'Specialty Item', mixed: 'Mixed Job' };
+        var notes = document.getElementById('jobNotes').value;
+        var date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        var lines = [
+            '═══════════════════════════════════════',
+            '  JUNK REMOVAL QUOTE SUMMARY',
+            '  ' + date,
+            '═══════════════════════════════════════',
+            '',
+            'Customer:    ' + name,
+        ];
+        if (addr) lines.push('Address:     ' + addr);
+        lines.push('Job Type:    ' + (labels[jt] || jt));
+        if (c.hours > 0) lines.push('Est. Hours:  ' + c.hours);
+        lines.push('');
+        lines.push('───────────────────────────────────────');
+        lines.push('  PRICING');
+        lines.push('───────────────────────────────────────');
+        lines.push('Subtotal:          $' + fmt(c.subtotal));
+        if (c.taxRate > 0) {
+            lines.push('Tax (' + c.taxRate + '%):        +$' + fmt(c.taxAmount));
+            lines.push('Customer Pays:     $' + fmt(c.totalQuotePrice));
+        }
+        lines.push('');
+        lines.push('───────────────────────────────────────');
+        lines.push('  COSTS');
+        lines.push('───────────────────────────────────────');
+        c.costs.forEach(function(x) { if (x.v > 0) lines.push(x.l + ':' + ' '.repeat(19 - x.l.length) + '$' + fmt(x.v)); });
+        lines.push('Total Costs:       $' + fmt(c.totalCost));
+        lines.push('');
+        lines.push('───────────────────────────────────────');
+        lines.push('  PROFIT ANALYSIS');
+        lines.push('───────────────────────────────────────');
+        lines.push('Your Profit:       $' + fmt(c.profit));
+        lines.push('Gross Margin:      ' + c.margin.toFixed(1) + '%');
+        if (c.hours > 0) lines.push('$/Hour:            $' + fmt(c.hourlyRate));
+        lines.push('Breakeven Price:   $' + fmt(c.breakeven));
+        if (notes) { lines.push(''); lines.push('───────────────────────────────────────'); lines.push('  NOTES'); lines.push('───────────────────────────────────────'); lines.push(notes); }
+        lines.push('');
+        lines.push('═══════════════════════════════════════');
+        lines.push('  Generated by Junk Removal Profit Calculator');
+        lines.push('  Powered by dyia — dyia.co');
+        lines.push('═══════════════════════════════════════');
+
+        var text = lines.join('\n');
+        var blob = new Blob([text], { type: 'text/plain' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'Quote_' + name.replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 
     function openSaveModal() {
         var c = currentCalc();

@@ -10,6 +10,7 @@
     <meta name="theme-color" content="#0a0a0a">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{min-height:100vh;background:linear-gradient(135deg,#0a0a0a,#111111);padding:2rem 1rem;font-family:'DM Sans',-apple-system,sans-serif;color:#fafafa}
@@ -388,7 +389,7 @@
             <button type="button" id="modalSaveLocal" style="width:100%;padding:.875rem;border-radius:12px;background:linear-gradient(135deg,#f97316,#f59e0b);color:#fff;font-weight:700;font-size:.875rem;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(249,115,22,.25);margin-bottom:.5rem">Save to local history</button>
             <button type="button" id="modalDownload" style="width:100%;padding:.75rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem">
                 <svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Download quote summary
+                Download as PDF
             </button>
             <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);text-align:center">
                 <p style="color:rgba(255,255,255,.25);font-size:.6875rem;margin-bottom:.5rem">Want to sync quotes across devices?</p>
@@ -634,7 +635,7 @@
             downloadQuoteSummary();
             this.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Downloaded!';
             var self = this;
-            setTimeout(function() { self.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Download quote summary'; }, 1500);
+            setTimeout(function() { self.innerHTML = '<svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Download as PDF'; }, 1500);
         });
 
         updateJobTypeDisplay();
@@ -650,57 +651,168 @@
         var notes = document.getElementById('jobNotes').value;
         var date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-        var lines = [
-            '═══════════════════════════════════════',
-            '  JUNK REMOVAL QUOTE SUMMARY',
-            '  ' + date,
-            '═══════════════════════════════════════',
-            '',
-            'Customer:    ' + name,
-        ];
-        if (addr) lines.push('Address:     ' + addr);
-        lines.push('Job Type:    ' + (labels[jt] || jt));
-        if (c.hours > 0) lines.push('Est. Hours:  ' + c.hours);
-        lines.push('');
-        lines.push('───────────────────────────────────────');
-        lines.push('  PRICING');
-        lines.push('───────────────────────────────────────');
-        lines.push('Subtotal:          $' + fmt(c.subtotal));
-        if (c.taxRate > 0) {
-            lines.push('Tax (' + c.taxRate + '%):        +$' + fmt(c.taxAmount));
-            lines.push('Customer Pays:     $' + fmt(c.totalQuotePrice));
-        }
-        lines.push('');
-        lines.push('───────────────────────────────────────');
-        lines.push('  COSTS');
-        lines.push('───────────────────────────────────────');
-        c.costs.forEach(function(x) { if (x.v > 0) lines.push(x.l + ':' + ' '.repeat(19 - x.l.length) + '$' + fmt(x.v)); });
-        lines.push('Total Costs:       $' + fmt(c.totalCost));
-        lines.push('');
-        lines.push('───────────────────────────────────────');
-        lines.push('  PROFIT ANALYSIS');
-        lines.push('───────────────────────────────────────');
-        lines.push('Your Profit:       $' + fmt(c.profit));
-        lines.push('Gross Margin:      ' + c.margin.toFixed(1) + '%');
-        if (c.hours > 0) lines.push('$/Hour:            $' + fmt(c.hourlyRate));
-        lines.push('Breakeven Price:   $' + fmt(c.breakeven));
-        if (notes) { lines.push(''); lines.push('───────────────────────────────────────'); lines.push('  NOTES'); lines.push('───────────────────────────────────────'); lines.push(notes); }
-        lines.push('');
-        lines.push('═══════════════════════════════════════');
-        lines.push('  Generated by Junk Removal Profit Calculator');
-        lines.push('  Powered by dyia — dyia.co');
-        lines.push('═══════════════════════════════════════');
+        var doc = new jspdf.jsPDF({ unit: 'mm', format: 'letter' });
+        var W = doc.internal.pageSize.getWidth();
+        var mg = 20;
+        var cw = W - mg * 2;
+        var y = 0;
 
-        var text = lines.join('\n');
-        var blob = new Blob([text], { type: 'text/plain' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'Quote_' + name.replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        // Brand header bar
+        doc.setFillColor(249, 115, 22);
+        doc.rect(0, 0, W, 38, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255);
+        doc.text('Quote Summary', mg, 18);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(date, mg, 28);
+        doc.setFontSize(9);
+        doc.text('Powered by dyia', W - mg, 28, { align: 'right' });
+
+        y = 52;
+
+        // Customer info section
+        doc.setFillColor(248, 248, 248);
+        doc.roundedRect(mg, y - 6, cw, addr ? 28 : 20, 3, 3, 'F');
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('CUSTOMER', mg + 5, y);
+        doc.setFontSize(13);
+        doc.setTextColor(30, 30, 30);
+        doc.setFont('helvetica', 'bold');
+        doc.text(name, mg + 5, y + 8);
+        if (addr) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.text(addr, mg + 5, y + 16); }
+
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('JOB TYPE', W - mg - 50, y);
+        doc.setFontSize(11);
+        doc.setTextColor(30, 30, 30);
+        doc.setFont('helvetica', 'bold');
+        doc.text(labels[jt] || jt, W - mg - 50, y + 8);
+        if (c.hours > 0) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(c.hours + ' hours on-site', W - mg - 50, y + 16); }
+
+        y += addr ? 36 : 28;
+
+        // Big margin display
+        var marginColor = c.margin >= 50 ? [249, 115, 22] : c.margin >= 30 ? [234, 179, 8] : [220, 38, 38];
+        doc.setFillColor(marginColor[0], marginColor[1], marginColor[2]);
+        doc.roundedRect(mg, y, cw, 32, 3, 3, 'F');
+        doc.setFontSize(28);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.text(c.margin.toFixed(1) + '%', mg + cw / 2, y + 16, { align: 'center' });
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text('GROSS PROFIT MARGIN', mg + cw / 2, y + 25, { align: 'center' });
+
+        y += 42;
+
+        // Pricing breakdown
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.setFont('helvetica', 'bold');
+        doc.text('PRICING', mg, y);
+        y += 6;
+        doc.setDrawColor(230, 230, 230);
+        doc.line(mg, y, W - mg, y);
+        y += 7;
+
+        function row(label, value, bold, color) {
+            doc.setFont('helvetica', bold ? 'bold' : 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(color ? color[0] : 80, color ? color[1] : 80, color ? color[2] : 80);
+            doc.text(label, mg + 2, y);
+            doc.text(value, W - mg - 2, y, { align: 'right' });
+            y += 7;
+        }
+
+        row('Subtotal', '$' + fmt(c.subtotal), false);
+        if (c.taxRate > 0) {
+            row('Tax (' + c.taxRate + '%)', '+$' + fmt(c.taxAmount), false, [100, 100, 100]);
+            row('Customer Pays', '$' + fmt(c.totalQuotePrice), true, [30, 30, 30]);
+        }
+        y += 3;
+
+        // Costs breakdown
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.setFont('helvetica', 'bold');
+        doc.text('COSTS', mg, y);
+        y += 6;
+        doc.line(mg, y, W - mg, y);
+        y += 7;
+
+        var costColors = { Landfill: [239, 68, 68], Dumpster: [236, 72, 153], Equipment: [168, 85, 247], Truck: [59, 130, 246], Fuel: [6, 182, 212], Labor: [245, 158, 11] };
+        c.costs.forEach(function(x) {
+            if (x.v > 0) {
+                var cc = costColors[x.l] || [100, 100, 100];
+                doc.setFillColor(cc[0], cc[1], cc[2]);
+                doc.circle(mg + 4, y - 1.5, 1.5, 'F');
+                row(x.l, '$' + fmt(x.v), false);
+            }
+        });
+        doc.setDrawColor(200, 200, 200);
+        doc.line(mg + 2, y - 2, W - mg - 2, y - 2);
+        y += 2;
+        row('Total Costs', '$' + fmt(c.totalCost), true, [220, 38, 38]);
+        y += 5;
+
+        // Profit analysis
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.setFont('helvetica', 'bold');
+        doc.text('PROFIT ANALYSIS', mg, y);
+        y += 6;
+        doc.setDrawColor(230, 230, 230);
+        doc.line(mg, y, W - mg, y);
+        y += 7;
+
+        doc.setFillColor(marginColor[0], marginColor[1], marginColor[2]);
+        doc.roundedRect(mg, y - 5, cw, 14, 2, 2, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(255, 255, 255);
+        doc.text('Your Profit', mg + 5, y + 3);
+        doc.text('$' + fmt(c.profit), W - mg - 5, y + 3, { align: 'right' });
+        y += 16;
+
+        row('Gross Margin', c.margin.toFixed(1) + '%', true, marginColor);
+        if (c.hours > 0) {
+            var hrColor = c.hourlyRate >= 75 ? [249, 115, 22] : c.hourlyRate >= 40 ? [234, 179, 8] : [220, 38, 38];
+            row('$/Hour', '$' + fmt(c.hourlyRate), true, hrColor);
+        }
+        row('Breakeven Price', '$' + fmt(c.breakeven), false, [100, 100, 100]);
+
+        // Notes
+        if (notes) {
+            y += 5;
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.setFont('helvetica', 'bold');
+            doc.text('NOTES', mg, y);
+            y += 6;
+            doc.line(mg, y, W - mg, y);
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            var splitNotes = doc.splitTextToSize(notes, cw - 4);
+            doc.text(splitNotes, mg + 2, y);
+        }
+
+        // Footer
+        var fY = doc.internal.pageSize.getHeight() - 12;
+        doc.setDrawColor(230, 230, 230);
+        doc.line(mg, fY - 6, W - mg, fY - 6);
+        doc.setFontSize(7);
+        doc.setTextColor(180, 180, 180);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Generated by Junk Removal Profit Calculator — Powered by dyia (dyia.co)', mg, fY);
+        doc.text(date, W - mg, fY, { align: 'right' });
+
+        doc.save('Quote_' + name.replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
     }
 
     function openSaveModal() {
